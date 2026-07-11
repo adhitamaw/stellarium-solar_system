@@ -23,11 +23,6 @@ export function FinishingBar() {
     if (!audioEnabled) {
       const ok = await enableAudio(audioVolume || 0.85);
       if (ok) setAudioEnabled(true);
-      else {
-        console.warn(
-          "Audio gagal start — coba klik lagi atau izinkan suara di browser",
-        );
-      }
     } else {
       stopAudio();
       setAudioEnabled(false);
@@ -37,66 +32,79 @@ export function FinishingBar() {
   const onShare = async () => {
     const id = selectedId ?? "earth";
     const ok = await copyFocusLink(id);
-    setShareMsg(ok ? "Link disalin!" : "Gagal salin link");
+    setShareMsg(ok ? "Link disalin!" : "Gagal salin");
     window.setTimeout(() => setShareMsg(null), 1800);
   };
 
+  const btn =
+    "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[11px] font-medium transition sm:h-auto sm:rounded-xl sm:px-2.5 sm:py-1.5 sm:text-xs";
+
   return (
     <div className="pointer-events-auto flex flex-col items-end gap-1">
-      <div className="flex flex-wrap items-center justify-end gap-1.5 rounded-2xl border border-white/10 bg-slate-950/75 p-1.5 shadow-xl backdrop-blur-xl">
+      <div className="flex max-w-[100%] flex-wrap items-center justify-end gap-1 rounded-xl border border-white/10 bg-slate-950/80 p-1 shadow-xl backdrop-blur-xl sm:gap-1.5 sm:rounded-2xl sm:p-1.5">
         <button
           type="button"
           onClick={() => void onToggleAudio()}
-          className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition ${
+          className={`${btn} ${
             audioEnabled
               ? "bg-emerald-500/25 text-emerald-100 ring-1 ring-emerald-400/40"
-              : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+              : "bg-white/5 text-white/70"
           }`}
-          title="Toggle suara ambient (M)"
+          title="Suara"
+          aria-label="Toggle suara"
         >
-          {audioEnabled ? "🔊 ON" : "🔇 Suara"}
+          <span className="sm:hidden">{audioEnabled ? "🔊" : "🔇"}</span>
+          <span className="hidden sm:inline">
+            {audioEnabled ? "🔊 ON" : "🔇 Suara"}
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => void onShare()}
-          className="rounded-xl px-2.5 py-1.5 text-xs font-medium text-white/55 transition hover:bg-white/10 hover:text-white"
-          title="Salin / bagikan link fokus objek"
+          className={`${btn} text-white/55 hover:bg-white/10 hover:text-white`}
+          title="Share"
+          aria-label="Share link"
         >
-          🔗 Share
+          <span className="sm:hidden">🔗</span>
+          <span className="hidden sm:inline">🔗 Share</span>
         </button>
 
         <button
           type="button"
           onClick={toggleCompareMode}
-          className={`rounded-xl px-2.5 py-1.5 text-xs font-medium transition ${
+          className={`${btn} ${
             compareMode
               ? "bg-amber-500/25 text-amber-100 ring-1 ring-amber-400/35"
-              : "text-white/55 hover:bg-white/10 hover:text-white"
+              : "text-white/55 hover:bg-white/10"
           }`}
-          title="Banding ukuran (B)"
+          title="Banding"
+          aria-label="Banding ukuran"
         >
-          ⚖ Banding
+          <span className="sm:hidden">⚖</span>
+          <span className="hidden sm:inline">⚖ Banding</span>
         </button>
 
         <button
           type="button"
           onClick={requestCapture}
-          className="rounded-xl px-2.5 py-1.5 text-xs font-medium text-white/55 transition hover:bg-white/10 hover:text-white"
-          title="Screenshot (C)"
+          className={`${btn} text-white/55 hover:bg-white/10 hover:text-white`}
+          title="Capture"
+          aria-label="Screenshot"
         >
-          📷 Capture
+          <span className="sm:hidden">📷</span>
+          <span className="hidden sm:inline">📷 Capture</span>
         </button>
 
         <button
           type="button"
           onClick={() => setAutoQuality(!autoQuality)}
-          className={`rounded-xl px-2.5 py-1.5 text-xs font-medium transition ${
+          className={`${btn} hidden sm:inline-flex ${
             autoQuality
               ? "bg-sky-500/20 text-sky-100 ring-1 ring-sky-400/30"
               : "text-white/45 hover:bg-white/10"
           }`}
-          title="Auto quality berdasarkan FPS"
+          title="Auto quality"
         >
           {autoQuality ? "AUTO" : "Manual"}
         </button>
@@ -104,8 +112,8 @@ export function FinishingBar() {
         <button
           type="button"
           onClick={() => setShowShortcuts(!showShortcuts)}
-          className="rounded-xl px-2 py-1.5 text-xs text-white/40 transition hover:bg-white/10 hover:text-white/80"
-          title="Shortcuts (?)"
+          className={`${btn} hidden text-white/40 hover:bg-white/10 sm:inline-flex`}
+          title="Shortcuts"
         >
           ?
         </button>

@@ -24,7 +24,7 @@ export function MobileHints() {
   if (!show) return null;
 
   return (
-    <div className="pointer-events-none absolute bottom-24 left-1/2 z-20 w-[min(92vw,320px)] -translate-x-1/2 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-center text-xs text-white/70 shadow-xl backdrop-blur-md sm:hidden">
+    <div className="pointer-events-none absolute bottom-[11.5rem] left-1/2 z-20 w-[min(92vw,300px)] -translate-x-1/2 rounded-2xl border border-white/10 bg-slate-950/85 px-3 py-2.5 text-center text-[11px] text-white/70 shadow-xl backdrop-blur-md sm:hidden">
       <p className="font-medium text-white/90">Kontrol sentuh</p>
       <p className="mt-1 text-white/50">
         1 jari putar · 2 jari cubit zoom · navigasi kiri Prev/Next

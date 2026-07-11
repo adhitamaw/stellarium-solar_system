@@ -28,12 +28,18 @@ export function Onboarding() {
   if (!show) return null;
 
   return (
-    <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-gradient-to-b from-slate-900/95 to-slate-950/95 p-6 shadow-2xl sm:p-8">
+    <div
+      className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm sm:p-4"
+      style={{
+        paddingTop: "max(0.75rem, env(safe-area-inset-top))",
+        paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+      }}
+    >
+      <div className="max-h-[min(90dvh,640px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/95 to-slate-950/95 p-4 shadow-2xl sm:rounded-3xl sm:p-8">
         <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-300/80">
-          Stellarium Cinematic · Finishing
+          Stellarium Cinematic
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+        <h1 className="text-xl font-semibold tracking-tight text-white sm:text-3xl">
           Siap dieksplorasi
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-white/60">

@@ -4,7 +4,7 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { celestialBodies } from "@/data/celestialBodies";
 import { useSimulationStore } from "@/store/useSimulationStore";
 
-export function SearchBar() {
+export function SearchBar({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,11 +44,16 @@ export function SearchBar() {
           setOpen(true);
           setTimeout(() => inputRef.current?.focus(), 0);
         }}
-        className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white/60 shadow-lg backdrop-blur-xl transition hover:border-white/20 hover:text-white/90"
+        className={`flex items-center gap-1.5 border border-white/10 bg-slate-950/80 text-white/60 shadow-lg backdrop-blur-xl transition hover:border-white/20 hover:text-white/90 ${
+          compact
+            ? "h-8 rounded-lg px-2 text-xs"
+            : "rounded-xl px-3 py-2 text-sm"
+        }`}
+        aria-label="Cari objek"
       >
         <SearchIcon />
         <span className="hidden sm:inline">Cari objek…</span>
-        <kbd className="ml-2 hidden rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40 sm:inline">
+        <kbd className="ml-1 hidden rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40 md:inline">
           ⌘K
         </kbd>
       </button>
@@ -60,24 +65,25 @@ export function SearchBar() {
             onClick={() => setOpen(false)}
             aria-hidden
           />
-          <div className="absolute right-0 top-0 z-40 w-[min(100vw-2rem,300px)] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl">
+          <div className="absolute right-0 top-0 z-40 w-[min(100vw-1rem,300px)] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl">
             <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
               <SearchIcon />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Planet, bulan, matahari…"
+                placeholder="Planet, bulan…"
                 className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/35"
                 aria-label="Cari objek langit"
+                autoFocus
               />
             </div>
-            <ul className="max-h-64 overflow-y-auto py-1" role="listbox">
+            <ul className="max-h-[50dvh] overflow-y-auto py-1" role="listbox">
               {results.map((b) => (
                 <li key={b.id}>
                   <button
                     type="button"
-                    className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition hover:bg-white/10"
+                    className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition hover:bg-white/10 active:bg-white/15"
                     onClick={() => {
                       focusBody(b.id, "search");
                       setOpen(false);

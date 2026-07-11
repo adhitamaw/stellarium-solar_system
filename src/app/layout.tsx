@@ -37,6 +37,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  // Critical for iPhone notch / home bar layout
   viewportFit: "cover",
   themeColor: "#02040a",
 };

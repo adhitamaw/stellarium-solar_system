@@ -24,7 +24,7 @@ export function TourPanel() {
   const atEnd = tourStepIndex >= total - 1;
 
   return (
-    <div className="pointer-events-auto w-[min(100%,320px)] rounded-2xl border border-white/10 bg-slate-950/75 p-2.5 shadow-xl backdrop-blur-xl">
+    <div className="pointer-events-auto w-full max-w-[280px] rounded-xl border border-white/10 bg-slate-950/80 p-2 shadow-xl backdrop-blur-xl sm:max-w-[320px] sm:rounded-2xl sm:p-2.5">
       <div className="mb-2 flex items-center justify-between gap-2 px-0.5">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">
           Navigasi

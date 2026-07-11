@@ -20,6 +20,11 @@ function formatSimDate(simDays: number): string {
   });
 }
 
+/** Fewer presets on tiny screens */
+const MOBILE_SPEEDS = SPEED_PRESETS.filter((p) =>
+  [1, 1_000, 5_000, 10_000, 100_000, 1_000_000].includes(p.value),
+);
+
 export function TimeControls() {
   const simDays = useSimulationStore((s) => s.simDaysUi);
   const speed = useSimulationStore((s) => s.speed);
@@ -28,15 +33,11 @@ export function TimeControls() {
   const setSpeed = useSimulationStore((s) => s.setSpeed);
   const setSimDays = useSimulationStore((s) => s.setSimDays);
 
-  // Sync simClock with store; fall back to 5k× if speed is not a known preset
   useEffect(() => {
     const current = useSimulationStore.getState().speed;
     const known = SPEED_PRESETS.some((p) => p.value === current);
-    if (!known) {
-      setSpeed(DEFAULT_SPEED);
-    } else {
-      simClock.speed = current;
-    }
+    if (!known) setSpeed(DEFAULT_SPEED);
+    else simClock.speed = current;
   }, [setSpeed]);
 
   const jump = (days: number) => {
@@ -44,64 +45,68 @@ export function TimeControls() {
   };
 
   return (
-    <div className="pointer-events-auto flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2.5 shadow-xl backdrop-blur-xl sm:flex-row sm:items-center sm:gap-3">
-      <div className="flex items-center gap-1.5">
-        <IconButton label="Mundur 30 hari" onClick={() => jump(-30)}>
-          <SkipIcon dir="back" />
-        </IconButton>
-        <IconButton
-          label={isPlaying ? "Jeda" : "Putar"}
-          onClick={togglePlay}
-          primary
-        >
-          {isPlaying ? <PauseIcon /> : <PlayIcon />}
-        </IconButton>
-        <IconButton label="Maju 30 hari" onClick={() => jump(30)}>
-          <SkipIcon dir="fwd" />
-        </IconButton>
-        <IconButton label="Reset ke epoch" onClick={() => setSimDays(0)}>
-          <ResetIcon />
-        </IconButton>
+    <div className="pointer-events-auto rounded-xl border border-white/10 bg-slate-950/85 px-2 py-2 shadow-xl backdrop-blur-xl sm:rounded-2xl sm:px-3 sm:py-2.5">
+      {/* Row 1: transport + date */}
+      <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1">
+          <IconButton label="Mundur 30 hari" onClick={() => jump(-30)}>
+            <SkipIcon dir="back" />
+          </IconButton>
+          <IconButton
+            label={isPlaying ? "Jeda" : "Putar"}
+            onClick={togglePlay}
+            primary
+          >
+            {isPlaying ? <PauseIcon /> : <PlayIcon />}
+          </IconButton>
+          <IconButton label="Maju 30 hari" onClick={() => jump(30)}>
+            <SkipIcon dir="fwd" />
+          </IconButton>
+          <IconButton label="Reset" onClick={() => setSimDays(0)}>
+            <ResetIcon />
+          </IconButton>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="hidden text-[9px] font-medium uppercase tracking-wider text-white/40 sm:block">
+            Waktu simulasi
+          </p>
+          <p className="truncate font-mono text-xs text-sky-100 tabular-nums sm:text-sm">
+            {formatSimDate(simDays)}
+          </p>
+        </div>
       </div>
 
-      <div className="hidden h-6 w-px bg-white/10 sm:block" />
-
-      <div className="min-w-[7.5rem]">
-        <p className="text-[9px] font-medium uppercase tracking-wider text-white/40">
-          Waktu simulasi
-        </p>
-        <p className="font-mono text-sm text-sky-100 tabular-nums">
-          {formatSimDate(simDays)}
-        </p>
-      </div>
-
-      <div className="hidden h-6 w-px bg-white/10 sm:block" />
-
-      <div className="flex flex-wrap items-center gap-1">
-        <span className="mr-1 text-[9px] font-medium uppercase tracking-wider text-white/40">
-          Kecepatan
+      {/* Row 2: speed chips scrollable */}
+      <div className="chip-scroll mt-1.5 flex items-center gap-1 sm:mt-2 sm:flex-wrap">
+        <span className="shrink-0 text-[9px] font-medium uppercase tracking-wider text-white/40">
+          Speed
         </span>
-        {SPEED_PRESETS.map((p) => {
-          const active = speed === p.value;
-          return (
-            <button
+        {/* mobile subset */}
+        <div className="flex items-center gap-1 sm:hidden">
+          {MOBILE_SPEEDS.map((p) => (
+            <SpeedChip
               key={p.value}
-              type="button"
+              label={p.label}
+              active={speed === p.value}
               onClick={() => setSpeed(p.value)}
-              aria-pressed={active}
-              className={`rounded-md px-1.5 py-0.5 text-[11px] font-medium transition ${
-                active
-                  ? "bg-sky-500/35 text-sky-50 ring-1 ring-sky-400/50"
-                  : "text-white/50 hover:bg-white/10 hover:text-white/80"
-              }`}
-            >
-              {p.label}
-            </button>
-          );
-        })}
+            />
+          ))}
+        </div>
+        <div className="hidden items-center gap-1 sm:flex sm:flex-wrap">
+          {SPEED_PRESETS.map((p) => (
+            <SpeedChip
+              key={p.value}
+              label={p.label}
+              active={speed === p.value}
+              onClick={() => setSpeed(p.value)}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:min-w-[140px]">
+      {/* Row 3: scrub — full width */}
+      <div className="mt-1.5 flex items-center sm:mt-2">
         <input
           type="range"
           min={0}
@@ -114,6 +119,31 @@ export function TimeControls() {
         />
       </div>
     </div>
+  );
+}
+
+function SpeedChip({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium transition sm:text-[11px] ${
+        active
+          ? "bg-sky-500/35 text-sky-50 ring-1 ring-sky-400/50"
+          : "text-white/50 hover:bg-white/10 hover:text-white/80"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -134,10 +164,10 @@ function IconButton({
       onClick={onClick}
       aria-label={label}
       title={label}
-      className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
+      className={`flex h-9 w-9 items-center justify-center rounded-lg transition sm:h-8 sm:w-8 ${
         primary
-          ? "bg-sky-500/25 text-sky-100 ring-1 ring-sky-400/30 hover:bg-sky-500/40"
-          : "text-white/70 hover:bg-white/10 hover:text-white"
+          ? "bg-sky-500/25 text-sky-100 ring-1 ring-sky-400/30"
+          : "text-white/70 hover:bg-white/10"
       }`}
     >
       {children}

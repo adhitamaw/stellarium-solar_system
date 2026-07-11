@@ -26,13 +26,13 @@ export function InfoPanel() {
 
   const parent = body.parentId ? bodyById[body.parentId] : null;
 
-  // Hidden but still selected → small restore chip
+  // Hidden chip — top-right on desktop, bottom-right above time on mobile
   if (!showInfoPanel) {
     return (
       <button
         type="button"
         onClick={() => setShowInfoPanel(true)}
-        className="pointer-events-auto absolute right-4 top-[8.5rem] z-20 flex max-w-[min(100%-2rem,280px)] items-center gap-2 rounded-full border border-white/15 bg-slate-950/80 px-3 py-2 text-sm text-white/90 shadow-xl backdrop-blur-xl transition hover:border-sky-400/40 hover:bg-slate-900/90 sm:top-36"
+        className="pointer-events-auto absolute bottom-[9.5rem] right-2 z-20 flex max-w-[min(70vw,220px)] items-center gap-2 rounded-full border border-white/15 bg-slate-950/85 px-3 py-2 text-sm text-white/90 shadow-xl backdrop-blur-xl sm:bottom-auto sm:right-4 sm:top-36 sm:max-w-[280px]"
         title="Tampilkan info card"
       >
         <span
@@ -49,17 +49,17 @@ export function InfoPanel() {
 
   return (
     <aside
-      className="pointer-events-auto absolute right-4 top-[8.5rem] z-20 flex max-h-[calc(100dvh-11rem)] w-[min(100%-2rem,320px)] flex-col overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 shadow-2xl shadow-black/50 backdrop-blur-xl sm:top-36 sm:max-h-[calc(100dvh-10.5rem)]"
+      className="pointer-events-auto absolute bottom-[8.75rem] left-2 right-2 z-20 flex max-h-[min(42dvh,360px)] flex-col overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/90 p-3 shadow-2xl shadow-black/50 backdrop-blur-xl sm:bottom-auto sm:left-auto sm:right-4 sm:top-36 sm:max-h-[calc(100dvh-12rem)] sm:w-[min(100%-2rem,320px)] sm:p-4"
       role="dialog"
       aria-label={`Info ${body.name}`}
     >
-      <div className="mb-3 flex items-start justify-between gap-2">
+      <div className="mb-2 flex items-start justify-between gap-2 sm:mb-3">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-300/80">
             {typeLabel[body.type] ?? body.type}
             {parent ? ` · ${parent.name}` : ""}
           </p>
-          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-white">
+          <h2 className="mt-0.5 text-lg font-semibold tracking-tight text-white sm:text-xl">
             {body.name}
           </h2>
         </div>
@@ -67,9 +67,9 @@ export function InfoPanel() {
           <button
             type="button"
             onClick={() => setShowInfoPanel(false)}
-            className="rounded-lg p-1.5 text-white/50 transition hover:bg-white/10 hover:text-white"
+            className="rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white sm:p-1.5"
             aria-label="Sembunyikan card"
-            title="Sembunyikan (view tetap di objek)"
+            title="Sembunyikan"
           >
             <HideIcon />
           </button>
@@ -79,8 +79,8 @@ export function InfoPanel() {
               setShowInfoPanel(false);
               selectBody(null);
             }}
-            className="rounded-lg p-1.5 text-white/50 transition hover:bg-white/10 hover:text-white"
-            aria-label="Tutup & lepas fokus"
+            className="rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white sm:p-1.5"
+            aria-label="Tutup"
             title="Tutup"
           >
             <CloseIcon />
@@ -89,17 +89,17 @@ export function InfoPanel() {
       </div>
 
       <div
-        className="mb-3 h-1 w-full rounded-full"
+        className="mb-2 h-1 w-full rounded-full sm:mb-3"
         style={{
           background: `linear-gradient(90deg, ${body.color}, transparent)`,
         }}
       />
 
-      <p className="mb-4 text-sm leading-relaxed text-white/75">
+      <p className="mb-3 text-xs leading-relaxed text-white/75 sm:mb-4 sm:text-sm">
         {body.description}
       </p>
 
-      <dl className="space-y-2 text-sm">
+      <dl className="space-y-1.5 text-xs sm:space-y-2 sm:text-sm">
         <Row label="Radius" value={formatRadius(body.radiusKm)} />
         <Row
           label="Jarak orbit"
@@ -133,11 +133,11 @@ export function InfoPanel() {
         <Row label="Komposisi" value={body.composition} />
       </dl>
 
-      <div className="mt-4 rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2.5">
+      <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 sm:mt-4 sm:py-2.5">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-200/80">
           Fakta singkat
         </p>
-        <p className="mt-1 text-sm text-amber-50/90">{body.funFact}</p>
+        <p className="mt-1 text-xs text-amber-50/90 sm:text-sm">{body.funFact}</p>
       </div>
     </aside>
   );
@@ -145,7 +145,7 @@ export function InfoPanel() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-2 last:border-0">
+    <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-1.5 last:border-0 sm:pb-2">
       <dt className="shrink-0 text-white/45">{label}</dt>
       <dd className="text-right text-white/90">{value}</dd>
     </div>

@@ -20,22 +20,22 @@ export function ComparePanel() {
     a && b ? Math.max(a.radiusKm, b.radiusKm) / Math.min(a.radiusKm, b.radiusKm) : 1;
 
   return (
-    <div className="pointer-events-auto absolute left-1/2 top-20 z-30 w-[min(100%-2rem,420px)] -translate-x-1/2 rounded-2xl border border-amber-400/25 bg-slate-950/85 p-4 shadow-2xl backdrop-blur-xl">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div>
+    <div className="pointer-events-auto absolute left-1/2 top-14 z-30 w-[min(100%-1rem,420px)] -translate-x-1/2 rounded-2xl border border-amber-400/25 bg-slate-950/90 p-3 shadow-2xl backdrop-blur-xl sm:top-20 sm:w-[min(100%-2rem,420px)] sm:p-4">
+      <div className="mb-2 flex items-start justify-between gap-2 sm:mb-3">
+        <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
             Mode banding ukuran
           </p>
-          <p className="text-sm text-white/70">
+          <p className="text-xs text-white/70 sm:text-sm">
             Skala ilmiah radius (bukan jarak orbit)
           </p>
         </div>
         <button
           type="button"
           onClick={() => setCompareMode(false)}
-          className="rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 hover:text-white"
+          className="shrink-0 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 hover:text-white"
         >
-          Tutup · Esc
+          Tutup
         </button>
       </div>
 
