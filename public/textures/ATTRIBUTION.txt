@@ -1,0 +1,7 @@
+Solar System Scope textures (CC BY 4.0)
+https://www.solarsystemscope.com/textures/
+
+Includes 2K + 8K albedo maps, Earth night/clouds, normal & specular maps
+(converted from TIFF where needed).
+
+Please retain attribution when redistributing.
