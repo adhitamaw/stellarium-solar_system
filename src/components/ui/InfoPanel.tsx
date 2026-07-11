@@ -14,92 +14,140 @@ const typeLabel: Record<string, string> = {
   asteroid: "Asteroid",
 };
 
+/**
+ * Desktop: right side card
+ * Mobile: bottom sheet ABOVE the dock (only when open; chip lives in MobileDock)
+ */
 export function InfoPanel() {
   const selectedId = useSimulationStore((s) => s.selectedId);
   const showInfoPanel = useSimulationStore((s) => s.showInfoPanel);
   const setShowInfoPanel = useSimulationStore((s) => s.setShowInfoPanel);
   const selectBody = useSimulationStore((s) => s.selectBody);
 
-  if (!selectedId) return null;
+  if (!selectedId || !showInfoPanel) return null;
   const body = bodyById[selectedId];
   if (!body) return null;
 
   const parent = body.parentId ? bodyById[body.parentId] : null;
 
-  // Hidden chip — top-right on desktop, bottom-right above time on mobile
-  if (!showInfoPanel) {
-    return (
-      <button
-        type="button"
-        onClick={() => setShowInfoPanel(true)}
-        className="pointer-events-auto absolute bottom-[9.5rem] right-2 z-20 flex max-w-[min(70vw,220px)] items-center gap-2 rounded-full border border-white/15 bg-slate-950/85 px-3 py-2 text-sm text-white/90 shadow-xl backdrop-blur-xl sm:bottom-auto sm:right-4 sm:top-36 sm:max-w-[280px]"
-        title="Tampilkan info card"
-      >
-        <span
-          className="h-2 w-2 shrink-0 rounded-full"
-          style={{ background: body.color }}
-        />
-        <span className="truncate font-medium">{body.name}</span>
-        <span className="text-[10px] uppercase tracking-wider text-sky-300/80">
-          Info
-        </span>
-      </button>
-    );
-  }
-
   return (
-    <aside
-      className="pointer-events-auto absolute bottom-[8.75rem] left-2 right-2 z-20 flex max-h-[min(42dvh,360px)] flex-col overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/90 p-3 shadow-2xl shadow-black/50 backdrop-blur-xl sm:bottom-auto sm:left-auto sm:right-4 sm:top-36 sm:max-h-[calc(100dvh-12rem)] sm:w-[min(100%-2rem,320px)] sm:p-4"
-      role="dialog"
-      aria-label={`Info ${body.name}`}
-    >
-      <div className="mb-2 flex items-start justify-between gap-2 sm:mb-3">
-        <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-300/80">
-            {typeLabel[body.type] ?? body.type}
-            {parent ? ` · ${parent.name}` : ""}
-          </p>
-          <h2 className="mt-0.5 text-lg font-semibold tracking-tight text-white sm:text-xl">
-            {body.name}
-          </h2>
-        </div>
-        <div className="flex shrink-0 items-center gap-0.5">
-          <button
-            type="button"
-            onClick={() => setShowInfoPanel(false)}
-            className="rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white sm:p-1.5"
-            aria-label="Sembunyikan card"
-            title="Sembunyikan"
-          >
-            <HideIcon />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setShowInfoPanel(false);
-              selectBody(null);
-            }}
-            className="rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white sm:p-1.5"
-            aria-label="Tutup"
-            title="Tutup"
-          >
-            <CloseIcon />
-          </button>
-        </div>
+    <>
+      {/* Mobile bottom sheet */}
+      <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-[25] md:hidden">
+        {/* dim scene slightly when sheet open */}
+        <button
+          type="button"
+          className="absolute inset-x-0 bottom-[9.5rem] top-0 bg-black/25"
+          aria-label="Tutup info"
+          onClick={() => setShowInfoPanel(false)}
+        />
+        <aside
+          className="absolute inset-x-2 bottom-[9.25rem] flex max-h-[min(48dvh,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl"
+          role="dialog"
+          aria-label={`Info ${body.name}`}
+        >
+          <div className="flex items-center justify-center pt-2">
+            <span className="h-1 w-9 rounded-full bg-white/20" />
+          </div>
+          <div className="flex items-start justify-between gap-2 px-3 pb-2 pt-1">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-300/80">
+                {typeLabel[body.type] ?? body.type}
+                {parent ? ` · ${parent.name}` : ""}
+              </p>
+              <h2 className="truncate text-lg font-semibold text-white">
+                {body.name}
+              </h2>
+            </div>
+            <div className="flex shrink-0 gap-1">
+              <IconBtn
+                label="Sembunyikan"
+                onClick={() => setShowInfoPanel(false)}
+              >
+                <HideIcon />
+              </IconBtn>
+              <IconBtn
+                label="Tutup"
+                onClick={() => {
+                  setShowInfoPanel(false);
+                  selectBody(null);
+                }}
+              >
+                <CloseIcon />
+              </IconBtn>
+            </div>
+          </div>
+          <div className="overflow-y-auto px-3 pb-3">
+            <BodyContent body={body} parent={parent} compact />
+          </div>
+        </aside>
       </div>
 
+      {/* Desktop side card */}
+      <aside
+        className="pointer-events-auto absolute right-4 top-36 z-20 hidden max-h-[calc(100dvh-12rem)] w-[min(100%-2rem,320px)] flex-col overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 shadow-2xl shadow-black/50 backdrop-blur-xl md:flex"
+        role="dialog"
+        aria-label={`Info ${body.name}`}
+      >
+        <div className="mb-3 flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-300/80">
+              {typeLabel[body.type] ?? body.type}
+              {parent ? ` · ${parent.name}` : ""}
+            </p>
+            <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-white">
+              {body.name}
+            </h2>
+          </div>
+          <div className="flex shrink-0 gap-0.5">
+            <IconBtn
+              label="Sembunyikan"
+              onClick={() => setShowInfoPanel(false)}
+            >
+              <HideIcon />
+            </IconBtn>
+            <IconBtn
+              label="Tutup"
+              onClick={() => {
+                setShowInfoPanel(false);
+                selectBody(null);
+              }}
+            >
+              <CloseIcon />
+            </IconBtn>
+          </div>
+        </div>
+        <BodyContent body={body} parent={parent} />
+      </aside>
+    </>
+  );
+}
+
+function BodyContent({
+  body,
+  parent,
+  compact,
+}: {
+  body: (typeof bodyById)[string];
+  parent: (typeof bodyById)[string] | null | undefined;
+  compact?: boolean;
+}) {
+  return (
+    <>
       <div
-        className="mb-2 h-1 w-full rounded-full sm:mb-3"
+        className={`h-1 w-full rounded-full ${compact ? "mb-2" : "mb-3"}`}
         style={{
           background: `linear-gradient(90deg, ${body.color}, transparent)`,
         }}
       />
-
-      <p className="mb-3 text-xs leading-relaxed text-white/75 sm:mb-4 sm:text-sm">
+      <p
+        className={`leading-relaxed text-white/75 ${
+          compact ? "mb-2 text-xs" : "mb-4 text-sm"
+        }`}
+      >
         {body.description}
       </p>
-
-      <dl className="space-y-1.5 text-xs sm:space-y-2 sm:text-sm">
+      <dl className={`text-xs sm:text-sm ${compact ? "space-y-1.5" : "space-y-2"}`}>
         <Row label="Radius" value={formatRadius(body.radiusKm)} />
         <Row
           label="Jarak orbit"
@@ -129,26 +177,59 @@ export function InfoPanel() {
             body.rotationPeriodHours < 0 ? " (retrogade)" : ""
           }`}
         />
-        <Row label="Kemiringan sumbu" value={`${body.axialTiltDeg}°`} />
-        <Row label="Komposisi" value={body.composition} />
+        {!compact && (
+          <>
+            <Row label="Kemiringan sumbu" value={`${body.axialTiltDeg}°`} />
+            <Row label="Komposisi" value={body.composition} />
+          </>
+        )}
       </dl>
-
-      <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 sm:mt-4 sm:py-2.5">
+      <div
+        className={`rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 ${
+          compact ? "mt-2" : "mt-4"
+        }`}
+      >
         <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-200/80">
           Fakta singkat
         </p>
-        <p className="mt-1 text-xs text-amber-50/90 sm:text-sm">{body.funFact}</p>
+        <p className={`mt-1 text-amber-50/90 ${compact ? "text-xs" : "text-sm"}`}>
+          {body.funFact}
+        </p>
       </div>
-    </aside>
+      {parent && compact && (
+        <p className="mt-2 text-[10px] text-white/35">Orbit: {parent.name}</p>
+      )}
+    </>
   );
 }
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-1.5 last:border-0 sm:pb-2">
+    <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-1.5 last:border-0">
       <dt className="shrink-0 text-white/45">{label}</dt>
       <dd className="text-right text-white/90">{value}</dd>
     </div>
+  );
+}
+
+function IconBtn({
+  children,
+  onClick,
+  label,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className="rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white"
+    >
+      {children}
+    </button>
   );
 }
 
@@ -159,15 +240,9 @@ function HideIcon() {
         d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"
         stroke="currentColor"
         strokeWidth="2"
-        strokeLinejoin="round"
       />
       <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M4 4l16 16"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="M4 4l16 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

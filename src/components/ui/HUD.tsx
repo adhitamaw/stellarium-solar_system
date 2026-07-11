@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { InfoPanel } from "./InfoPanel";
 import { TimeControls } from "./TimeControls";
 import { SearchBar } from "./SearchBar";
@@ -12,14 +13,22 @@ import { DistanceChip } from "./DistanceChip";
 import { ShortcutsModal } from "./ShortcutsModal";
 import { KeyboardHandler } from "./KeyboardHandler";
 import { MobileHints } from "./MobileHints";
+import { MobileDock } from "./MobileDock";
+import { MoreMenu } from "./MoreMenu";
 import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLoadingStore } from "@/store/useLoadingStore";
 
+/**
+ * Layout strategy:
+ * - Mobile (< md): clean top bar + bottom dock only. Tools in ☰ menu.
+ * - Desktop (md+): left tools + right info + bottom time (original).
+ */
 export function HUD() {
   const cameraMode = useSimulationStore((s) => s.cameraMode);
   const compareMode = useSimulationStore((s) => s.compareMode);
   const hideHud = useSimulationStore((s) => s.hideHud);
   const sceneReady = useLoadingStore((s) => s.ready);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   if (hideHud) {
     return <KeyboardHandler />;
@@ -32,7 +41,6 @@ export function HUD() {
       }`}
       style={{
         paddingTop: "var(--safe-top)",
-        paddingBottom: "var(--safe-bottom)",
         paddingLeft: "var(--safe-left)",
         paddingRight: "var(--safe-right)",
       }}
@@ -40,34 +48,50 @@ export function HUD() {
       <KeyboardHandler />
       <MobileHints />
 
-      {/* Top bar — compact on portrait */}
-      <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 flex items-start justify-between gap-2 px-2 pt-2 sm:gap-3 sm:p-4">
-        <div className="pointer-events-none min-w-0 max-w-[42%] sm:max-w-none">
-          <p className="truncate text-[9px] font-semibold uppercase tracking-[0.2em] text-sky-300/70 sm:text-[10px] sm:tracking-[0.28em]">
-            Stellarium
+      {/* ─── MOBILE TOP ─── */}
+      <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 flex items-center justify-between gap-2 px-3 pt-2 md:hidden">
+        <p className="pointer-events-none text-[10px] font-semibold uppercase tracking-[0.22em] text-sky-300/75">
+          Stellarium
+        </p>
+        <div className="pointer-events-auto flex items-center gap-1.5">
+          <SearchBar compact />
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-slate-950/80 text-white/80 shadow-lg backdrop-blur-xl"
+            aria-label="Buka menu"
+          >
+            <MenuIcon />
+          </button>
+        </div>
+      </header>
+
+      {/* ─── DESKTOP TOP ─── */}
+      <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 hidden items-start justify-between gap-3 p-4 md:flex">
+        <div className="pointer-events-none">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-300/70">
+            Stellarium Cinematic
           </p>
-          <p className="hidden text-xs text-white/40 sm:block">
+          <p className="text-xs text-white/40">
             {compareMode
               ? "Mode banding ukuran"
               : "Simulator Tata Surya Interaktif"}
           </p>
         </div>
-        <div className="pointer-events-auto flex min-w-0 max-w-[58%] flex-col items-end gap-1.5 sm:max-w-none sm:gap-2">
-          <SearchBar compact />
+        <div className="pointer-events-auto flex flex-col items-end gap-2">
+          <SearchBar />
           <FinishingBar />
         </div>
       </header>
 
-      {/* Left tools — stack under header on mobile, avoid full width clash */}
+      {/* ─── DESKTOP LEFT ─── */}
       {!compareMode && (
-        <div className="absolute left-2 top-14 z-20 flex w-[min(100%-1rem,300px)] max-w-[calc(100vw-1rem)] flex-col gap-2 sm:left-4 sm:top-20 sm:max-w-[min(100%-2rem,420px)] sm:gap-3">
+        <div className="absolute left-4 top-20 z-20 hidden max-w-[min(100%-2rem,420px)] flex-col gap-3 md:flex">
           <Toolbar />
-          <div className="hidden sm:block">
-            <DistanceChip />
-          </div>
+          <DistanceChip />
           <TourPanel />
           {cameraMode === "fly" && (
-            <div className="pointer-events-none hidden rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-[11px] text-white/50 backdrop-blur-md sm:block">
+            <div className="pointer-events-none rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-[11px] text-white/50 backdrop-blur-md">
               <span className="font-medium text-white/70">Mode terbang:</span>{" "}
               WASD · Q/E · Shift
             </div>
@@ -75,19 +99,37 @@ export function HUD() {
         </div>
       )}
 
+      {/* Info: mobile sheet + desktop side card */}
       {!compareMode && <InfoPanel />}
 
       <ComparePanel />
       <ShortcutsModal />
+      <MoreMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      {/* Bottom time — safe area + leave room for home indicator */}
+      {/* ─── MOBILE BOTTOM DOCK ─── */}
+      {!compareMode && <MobileDock />}
+
+      {/* ─── DESKTOP BOTTOM TIME ─── */}
       {!compareMode && (
-        <div className="absolute bottom-2 left-1/2 z-20 w-[min(100%-0.75rem,820px)] -translate-x-1/2 sm:bottom-4 sm:w-[min(100%-2rem,820px)]">
+        <div className="absolute bottom-4 left-1/2 z-20 hidden w-[min(100%-2rem,820px)] -translate-x-1/2 md:block">
           <TimeControls />
         </div>
       )}
 
       <Onboarding />
     </div>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M4 7h16M4 12h16M4 17h16"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
