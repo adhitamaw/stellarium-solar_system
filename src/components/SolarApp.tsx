@@ -13,6 +13,7 @@ import {
 import { preferredQuality } from "@/lib/device";
 import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLoadingStore } from "@/store/useLoadingStore";
+import { hydrateLocale } from "@/store/useLocaleStore";
 
 const SolarCanvas = dynamic(
   () =>
@@ -30,6 +31,7 @@ export function SolarApp() {
 
   // Mobile/low-end: default to performance (2K textures, low DPR)
   useEffect(() => {
+    hydrateLocale();
     const q = preferredQuality();
     setQuality(q, false);
     // Keep auto quality on mobile so it can drop further if needed

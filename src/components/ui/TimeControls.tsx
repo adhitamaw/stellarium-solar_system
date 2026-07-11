@@ -7,6 +7,7 @@ import {
   SPEED_PRESETS,
   useSimulationStore,
 } from "@/store/useSimulationStore";
+import { useT } from "@/store/useLocaleStore";
 
 function formatSimDate(simDays: number): string {
   const epoch = new Date(Date.UTC(2000, 0, 1, 12));
@@ -26,6 +27,7 @@ export function TimeControls() {
   const togglePlay = useSimulationStore((s) => s.togglePlay);
   const setSpeed = useSimulationStore((s) => s.setSpeed);
   const setSimDays = useSimulationStore((s) => s.setSimDays);
+  const t = useT();
 
   useEffect(() => {
     const current = useSimulationStore.getState().speed;
@@ -44,7 +46,7 @@ export function TimeControls() {
             type="button"
             className="x-btn h-8 w-8"
             onClick={() => jump(-30)}
-            aria-label="Back 30 days"
+            aria-label={t("previous")}
           >
             <SkipIcon dir="back" />
           </button>
@@ -52,7 +54,7 @@ export function TimeControls() {
             type="button"
             className={`x-btn h-8 w-8 ${isPlaying ? "" : "x-btn-primary"}`}
             onClick={togglePlay}
-            aria-label={isPlaying ? "Pause" : "Play"}
+            aria-label={isPlaying ? t("pause") : t("play")}
           >
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
@@ -60,7 +62,7 @@ export function TimeControls() {
             type="button"
             className="x-btn h-8 w-8"
             onClick={() => jump(30)}
-            aria-label="Forward 30 days"
+            aria-label={t("next")}
           >
             <SkipIcon dir="fwd" />
           </button>
@@ -68,21 +70,21 @@ export function TimeControls() {
             type="button"
             className="x-btn h-8 w-8"
             onClick={() => setSimDays(0)}
-            aria-label="Reset"
+            aria-label={t("reset")}
           >
             <ResetIcon />
           </button>
         </div>
 
         <div className="min-w-[6.5rem]">
-          <p className="x-label">Epoch</p>
+          <p className="x-label">{t("epoch")}</p>
           <p className="mt-0.5 font-mono text-[13px] tabular-nums tracking-tight text-white">
             {formatSimDate(simDays)}
           </p>
         </div>
 
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
-          <span className="x-label mr-1">Speed</span>
+          <span className="x-label mr-1">{t("speed")}</span>
           {SPEED_PRESETS.map((p) => (
             <button
               key={p.value}
@@ -105,7 +107,7 @@ export function TimeControls() {
           value={((simDays % (365.25 * 50)) + 365.25 * 50) % (365.25 * 50)}
           onChange={(e) => setSimDays(Number(e.target.value))}
           className="h-1 w-full cursor-pointer accent-white"
-          aria-label="Time scrub"
+          aria-label={t("epoch")}
         />
       </div>
     </div>

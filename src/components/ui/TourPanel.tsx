@@ -3,6 +3,8 @@
 import { guidedTour } from "@/data/tours";
 import { bodyById } from "@/data/celestialBodies";
 import { useSimulationStore } from "@/store/useSimulationStore";
+import { useLocaleStore, useT } from "@/store/useLocaleStore";
+import { localizeBody, localizeTourStep } from "@/i18n/localize";
 
 /** Desktop navigator — monochrome control strip */
 export function TourPanel() {
@@ -11,9 +13,13 @@ export function TourPanel() {
   const setTourAuto = useSimulationStore((s) => s.setTourAuto);
   const nextTourStep = useSimulationStore((s) => s.nextTourStep);
   const prevTourStep = useSimulationStore((s) => s.prevTourStep);
+  const locale = useLocaleStore((s) => s.locale);
+  const t = useT();
 
-  const step = guidedTour[tourStepIndex] ?? guidedTour[0];
-  const body = step ? bodyById[step.targetId] : null;
+  const rawStep = guidedTour[tourStepIndex] ?? guidedTour[0];
+  const step = rawStep ? localizeTourStep(rawStep, locale) : null;
+  const bodyRaw = step ? bodyById[step.targetId] : null;
+  const body = bodyRaw ? localizeBody(bodyRaw, locale) : null;
   const name = body?.name ?? step?.title ?? "—";
   const total = guidedTour.length;
   const atStart = tourStepIndex <= 0;
@@ -22,7 +28,7 @@ export function TourPanel() {
   return (
     <div className="x-panel pointer-events-auto w-full max-w-[300px] p-2">
       <div className="mb-2 flex items-center justify-between px-1">
-        <p className="x-label">Navigate</p>
+        <p className="x-label">{t("navigate")}</p>
         <button
           type="button"
           role="switch"
@@ -32,7 +38,7 @@ export function TourPanel() {
             tourAuto ? "x-btn-primary" : ""
           }`}
         >
-          Auto {tourAuto ? "ON" : "OFF"}
+          {tourAuto ? t("autoOn") : t("autoOff")}
         </button>
       </div>
 
@@ -42,7 +48,7 @@ export function TourPanel() {
           onClick={prevTourStep}
           disabled={atStart}
           className="x-btn h-9 w-9 shrink-0"
-          aria-label="Previous"
+          aria-label={t("previous")}
         >
           <Chevron dir="left" />
         </button>
@@ -62,7 +68,7 @@ export function TourPanel() {
           onClick={nextTourStep}
           disabled={atEnd && !tourAuto}
           className="x-btn h-9 w-9 shrink-0"
-          aria-label="Next"
+          aria-label={t("next")}
         >
           <Chevron dir="right" />
         </button>

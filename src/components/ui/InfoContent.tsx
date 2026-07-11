@@ -6,15 +6,16 @@ import {
   formatRadius,
   type CelestialBody,
 } from "@/data/celestialBodies";
+import { localizeBody, bodyTypeLabel } from "@/i18n/localize";
+import { useLocaleStore, useT } from "@/store/useLocaleStore";
 
-const typeLabel: Record<string, string> = {
+/** Static fallback labels (prefer bodyTypeLabel + locale) */
+export const typeLabel: Record<string, string> = {
   star: "Bintang",
   planet: "Planet",
   moon: "Bulan",
   asteroid: "Asteroid",
 };
-
-export { typeLabel };
 
 /** Spec-sheet style body facts — monochrome, technical */
 export function InfoBody({
@@ -24,7 +25,27 @@ export function InfoBody({
   body: CelestialBody;
   compact?: boolean;
 }) {
-  const parent = body.parentId ? bodyById[body.parentId] : null;
+  const locale = useLocaleStore((s) => s.locale);
+  const t = useT();
+  const b = localizeBody(body, locale);
+  const parentRaw = body.parentId ? bodyById[body.parentId] : null;
+  const parent = parentRaw ? localizeBody(parentRaw, locale) : null;
+
+  const orbitValue =
+    body.type === "moon"
+      ? `${(body.orbitRadius / 1000).toFixed(0)} ${t("thousandKm")}`
+      : formatDistance(body.distanceAu);
+
+  const periodValue =
+    body.orbitalPeriodDays !== 0
+      ? Math.abs(body.orbitalPeriodDays) < 400
+        ? `${Math.abs(body.orbitalPeriodDays).toFixed(1)} ${t("days")}${
+            body.orbitalPeriodDays < 0 ? " · R" : ""
+          }`
+        : `${(Math.abs(body.orbitalPeriodDays) / 365.25).toFixed(1)} ${t("years")}${
+            body.orbitalPeriodDays < 0 ? " · R" : ""
+          }`
+      : null;
 
   return (
     <div className={compact ? "space-y-3" : "space-y-4"}>
@@ -33,61 +54,54 @@ export function InfoBody({
           compact ? "text-[12px]" : "text-[13px]"
         }`}
       >
-        {body.description}
+        {b.description}
       </p>
 
       <div className="border-t border-white/[0.08]">
-        <SpecRow label="Radius" value={formatRadius(body.radiusKm)} />
-        <SpecRow
-          label="Jarak orbit"
-          value={
-            body.type === "moon"
-              ? `${(body.orbitRadius / 1000).toFixed(0)} rb km`
-              : formatDistance(body.distanceAu)
-          }
-        />
-        {body.orbitalPeriodDays !== 0 && (
-          <SpecRow
-            label="Periode orbit"
-            value={
-              Math.abs(body.orbitalPeriodDays) < 400
-                ? `${Math.abs(body.orbitalPeriodDays).toFixed(1)} hari${
-                    body.orbitalPeriodDays < 0 ? " · R" : ""
-                  }`
-                : `${(Math.abs(body.orbitalPeriodDays) / 365.25).toFixed(1)} thn${
-                    body.orbitalPeriodDays < 0 ? " · R" : ""
-                  }`
-            }
-          />
+        <SpecRow label={t("radius")} value={formatRadius(body.radiusKm)} />
+        <SpecRow label={t("orbitDistance")} value={orbitValue} />
+        {periodValue && (
+          <SpecRow label={t("orbitalPeriod")} value={periodValue} />
         )}
         <SpecRow
-          label="Rotasi"
-          value={`${Math.abs(body.rotationPeriodHours).toFixed(1)} jam${
+          label={t("rotation")}
+          value={`${Math.abs(body.rotationPeriodHours).toFixed(1)} ${t("hours")}${
             body.rotationPeriodHours < 0 ? " · R" : ""
           }`}
         />
-        <SpecRow label="Kemiringan" value={`${body.axialTiltDeg}°`} />
-        <SpecRow label="Komposisi" value={body.composition} last />
+        <SpecRow label={t("axialTilt")} value={`${body.axialTiltDeg}°`} />
+        <SpecRow label={t("composition")} value={b.composition} last />
       </div>
 
       <div className="border border-white/[0.1] bg-white/[0.03] px-3 py-2.5">
-        <p className="x-label mb-1.5">Fakta</p>
+        <p className="x-label mb-1.5">{t("fact")}</p>
         <p
           className={`leading-relaxed text-white/70 ${
             compact ? "text-[12px]" : "text-[13px]"
           }`}
         >
-          {body.funFact}
+          {b.funFact}
         </p>
       </div>
 
       {parent && (
         <p className="font-mono text-[10px] tracking-wide text-white/25">
-          PARENT · {parent.name.toUpperCase()}
+          {t("parent").toUpperCase()} · {parent.name.toUpperCase()}
         </p>
       )}
     </div>
   );
+}
+
+export function useLocalizedBody(body: CelestialBody | null | undefined) {
+  const locale = useLocaleStore((s) => s.locale);
+  if (!body) return null;
+  return localizeBody(body, locale);
+}
+
+export function useBodyTypeLabel(type: CelestialBody["type"]) {
+  const locale = useLocaleStore((s) => s.locale);
+  return bodyTypeLabel(type, locale);
 }
 
 function SpecRow({

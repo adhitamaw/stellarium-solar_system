@@ -15,8 +15,10 @@ import { KeyboardHandler } from "./KeyboardHandler";
 import { MobileHints } from "./MobileHints";
 import { MobileDock } from "./MobileDock";
 import { MoreMenu } from "./MoreMenu";
+import { LanguageToggle } from "./LanguageToggle";
 import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLoadingStore } from "@/store/useLoadingStore";
+import { useT } from "@/store/useLocaleStore";
 
 /**
  * Layout strategy:
@@ -29,6 +31,7 @@ export function HUD() {
   const hideHud = useSimulationStore((s) => s.hideHud);
   const sceneReady = useLoadingStore((s) => s.ready);
   const [menuOpen, setMenuOpen] = useState(false);
+  const t = useT();
 
   if (hideHud) {
     return <KeyboardHandler />;
@@ -51,15 +54,16 @@ export function HUD() {
       {/* ─── MOBILE TOP ─── */}
       <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 flex items-center justify-between gap-2 px-3 pt-2 md:hidden">
         <p className="pointer-events-none text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">
-          Stellarium
+          {t("brand")}
         </p>
         <div className="pointer-events-auto flex items-center gap-1.5">
+          <LanguageToggle compact />
           <SearchBar compact />
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
             className="x-btn h-8 w-8"
-            aria-label="Open menu"
+            aria-label={t("openMenu")}
           >
             <MenuIcon />
           </button>
@@ -70,14 +74,17 @@ export function HUD() {
       <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 hidden items-start justify-between gap-3 p-4 md:flex">
         <div className="pointer-events-none">
           <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">
-            Stellarium
+            {t("brand")}
           </p>
           <p className="mt-0.5 text-[12px] text-white/25">
-            {compareMode ? "Compare" : "Solar system"}
+            {compareMode ? t("brandSubCompare") : t("brandSub")}
           </p>
         </div>
         <div className="pointer-events-auto flex flex-col items-end gap-2">
-          <SearchBar />
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+            <SearchBar />
+          </div>
           <FinishingBar />
         </div>
       </header>
@@ -90,7 +97,7 @@ export function HUD() {
           <TourPanel />
           {cameraMode === "fly" && (
             <div className="pointer-events-none rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-[11px] text-white/50 backdrop-blur-md">
-              <span className="font-medium text-white/70">Mode terbang:</span>{" "}
+              <span className="font-medium text-white/70">{t("flyMode")}:</span>{" "}
               WASD · Q/E · Shift
             </div>
           )}

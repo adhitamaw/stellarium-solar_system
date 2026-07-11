@@ -27,6 +27,8 @@ import {
 } from "@/shaders/planet";
 import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLoadingStore } from "@/store/useLoadingStore";
+import { useLocaleStore } from "@/store/useLocaleStore";
+import { localizeBody } from "@/i18n/localize";
 
 interface BodyMeshProps {
   body: CelestialBody;
@@ -50,6 +52,8 @@ export function BodyMesh({ body }: BodyMeshProps) {
   const scaleMode = useSimulationStore((s) => s.scaleMode);
   const quality = useSimulationStore((s) => s.quality);
   const focusBody = useSimulationStore((s) => s.focusBody);
+  const locale = useLocaleStore((s) => s.locale);
+  const displayName = localizeBody(body, locale).name;
 
   const selected = selectedId === body.id;
   const radius = visualRadius(body, scaleMode);
@@ -553,7 +557,7 @@ export function BodyMesh({ body }: BodyMeshProps) {
                 : "bg-black/40 text-white/70"
             }`}
           >
-            {body.name}
+            {displayName}
           </div>
         </Html>
       )}

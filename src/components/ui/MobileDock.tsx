@@ -9,7 +9,9 @@ import {
   useSimulationStore,
 } from "@/store/useSimulationStore";
 import { simClock } from "@/lib/simClock";
-import { InfoBody, typeLabel } from "./InfoContent";
+import { InfoBody } from "./InfoContent";
+import { useLocaleStore, useT } from "@/store/useLocaleStore";
+import { localizeBody, bodyTypeLabel } from "@/i18n/localize";
 
 const SPEEDS = SPEED_PRESETS.filter((p) =>
   [1, 5_000, 10_000, 100_000, 1_000_000].includes(p.value),
@@ -31,6 +33,8 @@ export function MobileDock() {
   const showInfoPanel = useSimulationStore((s) => s.showInfoPanel);
   const setShowInfoPanel = useSimulationStore((s) => s.setShowInfoPanel);
   const selectBody = useSimulationStore((s) => s.selectBody);
+  const locale = useLocaleStore((s) => s.locale);
+  const t = useT();
 
   useEffect(() => {
     const current = useSimulationStore.getState().speed;
@@ -42,13 +46,20 @@ export function MobileDock() {
   }, [setSpeed]);
 
   const step = guidedTour[tourStepIndex] ?? guidedTour[0];
-  const navBody = step ? bodyById[step.targetId] : null;
+  const navBodyRaw = step ? bodyById[step.targetId] : null;
+  const navBody = navBodyRaw ? localizeBody(navBodyRaw, locale) : null;
   const name = navBody?.name ?? "—";
   const total = guidedTour.length;
   const atStart = tourStepIndex <= 0;
   const atEnd = tourStepIndex >= total - 1;
   const date = formatSimDate(simDays);
-  const selectedBody = selectedId ? bodyById[selectedId] : null;
+  const selectedRaw = selectedId ? bodyById[selectedId] : null;
+  const selectedBody = selectedRaw
+    ? localizeBody(selectedRaw, locale)
+    : null;
+  const parentRaw =
+    selectedRaw?.parentId ? bodyById[selectedRaw.parentId] : null;
+  const parent = parentRaw ? localizeBody(parentRaw, locale) : null;
 
   return (
     <div
@@ -56,19 +67,17 @@ export function MobileDock() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="pointer-events-auto mx-2 mb-2 flex min-h-0 max-h-[min(92dvh,100%)] flex-col gap-1.5">
-        {selectedBody && showInfoPanel && (
+        {selectedBody && selectedRaw && showInfoPanel && (
           <aside
             className="x-panel flex min-h-0 max-h-[min(52dvh,420px)] flex-col overflow-hidden"
             role="dialog"
-            aria-label={`Info ${selectedBody.name}`}
+            aria-label={`${t("info")} ${selectedBody.name}`}
           >
             <div className="flex shrink-0 items-start justify-between gap-2 border-b border-white/[0.08] px-3 py-2.5">
               <div className="min-w-0">
                 <p className="x-label">
-                  {typeLabel[selectedBody.type] ?? selectedBody.type}
-                  {selectedBody.parentId && bodyById[selectedBody.parentId]
-                    ? ` / ${bodyById[selectedBody.parentId].name}`
-                    : ""}
+                  {bodyTypeLabel(selectedRaw.type, locale)}
+                  {parent ? ` / ${parent.name}` : ""}
                 </p>
                 <h2 className="mt-0.5 truncate text-[15px] font-medium tracking-tight text-white">
                   {selectedBody.name}
@@ -80,7 +89,7 @@ export function MobileDock() {
                   onClick={() => setShowInfoPanel(false)}
                   className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
                 >
-                  Hide
+                  {t("hide")}
                 </button>
                 <button
                   type="button"
@@ -89,7 +98,7 @@ export function MobileDock() {
                     selectBody(null);
                   }}
                   className="x-btn x-btn-ghost h-8 w-8"
-                  aria-label="Close"
+                  aria-label={t("close")}
                 >
                   ✕
                 </button>
@@ -100,7 +109,7 @@ export function MobileDock() {
               className="panel-scroll min-h-0 flex-1 px-3 py-2.5"
               style={{ WebkitOverflowScrolling: "touch" }}
             >
-              <InfoBody body={selectedBody} compact />
+              <InfoBody body={selectedRaw} compact />
               <div className="h-2" />
             </div>
           </aside>
@@ -116,14 +125,14 @@ export function MobileDock() {
             <span className="min-w-0 flex-1 truncate text-[13px] font-medium tracking-tight text-white">
               {selectedBody.name}
             </span>
-            <span className="x-label">Info</span>
+            <span className="x-label">{t("info")}</span>
           </button>
         )}
 
         <div className="x-panel shrink-0 p-1.5">
           <div className="flex items-center gap-1.5">
             <DockBtn
-              label="Previous"
+              label={t("previous")}
               disabled={atStart}
               onClick={prevTourStep}
             >
@@ -141,7 +150,7 @@ export function MobileDock() {
             </div>
 
             <DockBtn
-              label="Next"
+              label={t("next")}
               disabled={atEnd && !tourAuto}
               onClick={nextTourStep}
             >
@@ -157,13 +166,13 @@ export function MobileDock() {
                 tourAuto ? "x-btn-primary" : ""
               }`}
             >
-              Auto
+              {t("auto")}
             </button>
           </div>
 
           <div className="mt-1.5 flex items-center gap-1.5 border-t border-white/[0.06] pt-1.5">
             <DockBtn
-              label={isPlaying ? "Pause" : "Play"}
+              label={isPlaying ? t("pause") : t("play")}
               onClick={togglePlay}
               primary
             >

@@ -6,6 +6,8 @@ import {
   type QualityPreset,
   useSimulationStore,
 } from "@/store/useSimulationStore";
+import { useT } from "@/store/useLocaleStore";
+import { LanguageToggle } from "./LanguageToggle";
 
 export function MoreMenu({
   open,
@@ -31,6 +33,7 @@ export function MoreMenu({
   const requestCapture = useSimulationStore((s) => s.requestCapture);
   const selectedId = useSimulationStore((s) => s.selectedId);
   const fps = useSimulationStore((s) => s.fps);
+  const t = useT();
 
   if (!open) return null;
 
@@ -49,7 +52,7 @@ export function MoreMenu({
       <button
         type="button"
         className="absolute inset-0 bg-black/70"
-        aria-label="Close menu"
+        aria-label={t("close")}
         onClick={onClose}
       />
       <div
@@ -59,53 +62,57 @@ export function MoreMenu({
         <div className="mx-auto mb-4 h-px w-10 bg-white/25" />
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-[13px] font-medium tracking-wide text-white">
-            Systems
+            {t("systems")}
           </h2>
           <button
             type="button"
             onClick={onClose}
             className="x-btn h-8 px-3 text-[10px] uppercase tracking-[0.12em]"
           >
-            Close
+            {t("close")}
           </button>
         </div>
 
-        <Section title="Camera">
+        <Section title={t("lang")}>
+          <LanguageToggle />
+        </Section>
+
+        <Section title={t("camera")}>
           <Seg
             items={[
-              { id: "orbit", label: "Orbit" },
-              { id: "fly", label: "Fly" },
+              { id: "orbit", label: t("orbit") },
+              { id: "fly", label: t("fly") },
             ]}
             value={cameraMode}
             onChange={(v) => setCameraMode(v as "orbit" | "fly")}
           />
         </Section>
 
-        <Section title="Display">
+        <Section title={t("display")}>
           <Seg
             items={[
-              { id: "visible", label: "Clear scale" },
-              { id: "realistic", label: "Real scale" },
+              { id: "visible", label: t("clearScale") },
+              { id: "realistic", label: t("realScale") },
             ]}
             value={scaleMode}
             onChange={(v) => setScaleMode(v as "visible" | "realistic")}
           />
           <div className="mt-2 flex gap-2">
             <Toggle active={showOrbits} onClick={toggleOrbits}>
-              Orbits
+              {t("orbits")}
             </Toggle>
             <Toggle active={showLabels} onClick={toggleLabels}>
-              Labels
+              {t("labels")}
             </Toggle>
           </div>
         </Section>
 
-        <Section title="Quality">
+        <Section title={t("quality")}>
           <Seg
             items={[
-              { id: "performance", label: "Lite" },
-              { id: "balanced", label: "Balanced" },
-              { id: "ultra", label: "Ultra" },
+              { id: "performance", label: t("lite") },
+              { id: "balanced", label: t("balanced") },
+              { id: "ultra", label: t("ultra") },
             ]}
             value={quality}
             onChange={(v) => setQuality(v as QualityPreset)}
@@ -115,10 +122,10 @@ export function MoreMenu({
           </p>
         </Section>
 
-        <Section title="Actions">
+        <Section title={t("actions")}>
           <div className="grid grid-cols-2 gap-2">
             <Action onClick={() => void onAudio()}>
-              {audioEnabled ? "Audio · ON" : "Audio · OFF"}
+              {audioEnabled ? t("audioOn") : t("audioOff")}
             </Action>
             <Action
               onClick={async () => {
@@ -126,7 +133,7 @@ export function MoreMenu({
                 onClose();
               }}
             >
-              Share link
+              {t("shareLink")}
             </Action>
             <Action
               onClick={() => {
@@ -134,7 +141,7 @@ export function MoreMenu({
                 onClose();
               }}
             >
-              Compare
+              {t("compare")}
             </Action>
             <Action
               onClick={() => {
@@ -142,7 +149,7 @@ export function MoreMenu({
                 onClose();
               }}
             >
-              Capture
+              {t("capture")}
             </Action>
           </div>
         </Section>

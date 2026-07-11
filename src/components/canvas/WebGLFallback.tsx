@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useLoadingStore } from "@/store/useLoadingStore";
+import { useT } from "@/store/useLocaleStore";
 
 export function WebGLFallback({ error }: { error?: string }) {
+  const t = useT();
+
   useEffect(() => {
     useLoadingStore.getState().markReady();
   }, []);
@@ -12,15 +15,13 @@ export function WebGLFallback({ error }: { error?: string }) {
     <div className="absolute inset-0 z-[90] flex items-center justify-center bg-[#02040a] p-6 text-center">
       <div className="max-w-md">
         <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-300/70">
-          Stellarium Cinematic
+          {t("onboardingKicker")}
         </p>
         <h1 className="mt-2 text-xl font-semibold text-white">
-          WebGL tidak tersedia
+          {t("webglTitle")}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-white/55">
-          Browser atau perangkat ini tidak bisa menjalankan grafis 3D. Coba:
-          Chrome/Safari terbaru, matikan mode hemat daya ekstrem, atau buka di
-          desktop.
+          {t("webglBody")}
         </p>
         {error && (
           <p className="mt-3 rounded-lg bg-red-500/10 px-3 py-2 font-mono text-[11px] text-red-200/80">
@@ -32,7 +33,7 @@ export function WebGLFallback({ error }: { error?: string }) {
           onClick={() => window.location.reload()}
           className="mt-6 rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-semibold text-slate-950"
         >
-          Muat ulang
+          {t("reload")}
         </button>
       </div>
     </div>

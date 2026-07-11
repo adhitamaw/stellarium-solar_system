@@ -4,6 +4,7 @@ import { useState } from "react";
 import { enableAudio, stopAudio } from "@/lib/audio";
 import { copyFocusLink } from "@/lib/shareUrl";
 import { useSimulationStore } from "@/store/useSimulationStore";
+import { useT } from "@/store/useLocaleStore";
 
 export function FinishingBar() {
   const audioEnabled = useSimulationStore((s) => s.audioEnabled);
@@ -18,6 +19,7 @@ export function FinishingBar() {
   const setShowShortcuts = useSimulationStore((s) => s.setShowShortcuts);
   const selectedId = useSimulationStore((s) => s.selectedId);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
+  const t = useT();
 
   const onToggleAudio = async () => {
     if (!audioEnabled) {
@@ -32,7 +34,7 @@ export function FinishingBar() {
   const onShare = async () => {
     const id = selectedId ?? "earth";
     const ok = await copyFocusLink(id);
-    setShareMsg(ok ? "Link disalin!" : "Gagal salin");
+    setShareMsg(ok ? t("linkCopied") : t("linkFailed"));
     window.setTimeout(() => setShareMsg(null), 1800);
   };
 
@@ -45,18 +47,18 @@ export function FinishingBar() {
           className={`x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em] ${
             audioEnabled ? "x-btn-primary" : ""
           }`}
-          title="Audio"
+          title={t("audio")}
         >
-          {audioEnabled ? "Audio ON" : "Audio"}
+          {audioEnabled ? t("audioOn") : t("audio")}
         </button>
 
         <button
           type="button"
           onClick={() => void onShare()}
           className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
-          title="Share"
+          title={t("share")}
         >
-          Share
+          {t("share")}
         </button>
 
         <button
@@ -65,18 +67,18 @@ export function FinishingBar() {
           className={`x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em] ${
             compareMode ? "x-btn-primary" : ""
           }`}
-          title="Compare"
+          title={t("compare")}
         >
-          Compare
+          {t("compare")}
         </button>
 
         <button
           type="button"
           onClick={requestCapture}
           className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
-          title="Capture"
+          title={t("capture")}
         >
-          Capture
+          {t("capture")}
         </button>
 
         <button
@@ -85,16 +87,16 @@ export function FinishingBar() {
           className={`x-btn hidden h-8 px-2.5 text-[10px] uppercase tracking-[0.1em] sm:inline-flex ${
             autoQuality ? "x-btn-primary" : ""
           }`}
-          title="Auto quality"
+          title={t("quality")}
         >
-          {autoQuality ? "Auto Q" : "Manual"}
+          {autoQuality ? t("autoQ") : t("manualQ")}
         </button>
 
         <button
           type="button"
           onClick={() => setShowShortcuts(!showShortcuts)}
           className="x-btn hidden h-8 w-8 sm:inline-flex"
-          title="Help"
+          title={t("help")}
         >
           ?
         </button>

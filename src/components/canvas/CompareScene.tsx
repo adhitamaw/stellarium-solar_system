@@ -7,6 +7,8 @@ import { bodyById, celestialBodies, formatRadius } from "@/data/celestialBodies"
 import { bodyTextures } from "@/data/textures";
 import { loadTexture } from "@/lib/textures";
 import { useSimulationStore } from "@/store/useSimulationStore";
+import { useLocaleStore } from "@/store/useLocaleStore";
+import { localizeBody } from "@/i18n/localize";
 
 function CompareBody({
   id,
@@ -18,6 +20,8 @@ function CompareBody({
   displayRadius: number;
 }) {
   const body = bodyById[id];
+  const locale = useLocaleStore((s) => s.locale);
+  const displayName = body ? localizeBody(body, locale).name : id;
   const texSet = bodyTextures[id];
   const [map, setMap] = useState<THREE.Texture | null>(null);
 
@@ -84,7 +88,7 @@ function CompareBody({
       )}
       <Html position={[0, displayRadius * 1.35 + 0.4, 0]} center>
         <div className="pointer-events-none whitespace-nowrap rounded-xl border border-white/15 bg-black/70 px-3 py-1.5 text-center backdrop-blur-md">
-          <p className="text-sm font-semibold text-white">{body.name}</p>
+          <p className="text-sm font-semibold text-white">{displayName}</p>
           <p className="text-[11px] text-white/55">
             Ø ≈ {formatRadius(body.radiusKm * 2)}
           </p>

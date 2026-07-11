@@ -4,6 +4,7 @@ import {
   type QualityPreset,
   useSimulationStore,
 } from "@/store/useSimulationStore";
+import { useT } from "@/store/useLocaleStore";
 
 export function Toolbar() {
   const cameraMode = useSimulationStore((s) => s.cameraMode);
@@ -17,16 +18,16 @@ export function Toolbar() {
   const quality = useSimulationStore((s) => s.quality);
   const setQuality = useSimulationStore((s) => s.setQuality);
   const fps = useSimulationStore((s) => s.fps);
+  const t = useT();
 
   return (
     <div className="pointer-events-auto flex w-full flex-col gap-1">
-      {/* Primary tools — single scroll row on mobile */}
       <div className="chip-scroll flex max-w-full items-center gap-1 rounded-xl border border-white/10 bg-slate-950/80 p-1 shadow-xl backdrop-blur-xl sm:flex-wrap sm:gap-1.5 sm:rounded-2xl sm:p-1.5">
         <ToggleGroup
-          label="Kamera"
+          label={t("camera")}
           options={[
-            { id: "orbit", label: "Orbit" },
-            { id: "fly", label: "Terbang" },
+            { id: "orbit", label: t("orbit") },
+            { id: "fly", label: t("fly") },
           ]}
           value={cameraMode}
           onChange={(v) => setCameraMode(v as "orbit" | "fly")}
@@ -35,10 +36,10 @@ export function Toolbar() {
         <div className="mx-0.5 hidden h-5 w-px shrink-0 bg-white/10 sm:block" />
 
         <ToggleGroup
-          label="Skala"
+          label={t("display")}
           options={[
-            { id: "visible", label: "Jelas" },
-            { id: "realistic", label: "Real" },
+            { id: "visible", label: t("clearScale") },
+            { id: "realistic", label: t("realScale") },
           ]}
           value={scaleMode}
           onChange={(v) => setScaleMode(v as "visible" | "realistic")}
@@ -47,24 +48,23 @@ export function Toolbar() {
         <div className="mx-0.5 hidden h-5 w-px shrink-0 bg-white/10 sm:block" />
 
         <Chip active={showOrbits} onClick={toggleOrbits}>
-          Orbit
+          {t("orbits")}
         </Chip>
         <Chip active={showLabels} onClick={toggleLabels}>
-          Label
+          {t("labels")}
         </Chip>
       </div>
 
-      {/* Quality — desktop only (mobile forced performance) */}
       <div className="hidden flex-wrap items-center gap-1.5 rounded-2xl border border-white/10 bg-slate-950/70 p-1.5 shadow-xl backdrop-blur-xl sm:flex">
         <span className="px-1 text-[9px] font-medium uppercase tracking-wider text-white/40">
-          Kualitas
+          {t("quality")}
         </span>
         <ToggleGroup
-          label="Kualitas"
+          label={t("quality")}
           options={[
-            { id: "performance", label: "Perf" },
-            { id: "balanced", label: "Seimbang" },
-            { id: "ultra", label: "Ultra" },
+            { id: "performance", label: t("lite") },
+            { id: "balanced", label: t("balanced") },
+            { id: "ultra", label: t("ultra") },
           ]}
           value={quality}
           onChange={(v) => setQuality(v as QualityPreset)}

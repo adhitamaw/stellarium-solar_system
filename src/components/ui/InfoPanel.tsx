@@ -1,8 +1,10 @@
 "use client";
 
 import { bodyById } from "@/data/celestialBodies";
-import { InfoBody, typeLabel } from "./InfoContent";
+import { InfoBody } from "./InfoContent";
 import { useSimulationStore } from "@/store/useSimulationStore";
+import { useLocaleStore, useT } from "@/store/useLocaleStore";
+import { localizeBody, bodyTypeLabel } from "@/i18n/localize";
 
 /** Desktop telemetry card — SpaceX / xAI monochrome */
 export function InfoPanel() {
@@ -10,23 +12,28 @@ export function InfoPanel() {
   const showInfoPanel = useSimulationStore((s) => s.showInfoPanel);
   const setShowInfoPanel = useSimulationStore((s) => s.setShowInfoPanel);
   const selectBody = useSimulationStore((s) => s.selectBody);
+  const locale = useLocaleStore((s) => s.locale);
+  const t = useT();
 
   if (!selectedId || !showInfoPanel) return null;
-  const body = bodyById[selectedId];
-  if (!body) return null;
+  const raw = bodyById[selectedId];
+  if (!raw) return null;
 
-  const parent = body.parentId ? bodyById[body.parentId] : null;
+  const body = localizeBody(raw, locale);
+  const parentRaw = raw.parentId ? bodyById[raw.parentId] : null;
+  const parent = parentRaw ? localizeBody(parentRaw, locale) : null;
+  const typeLbl = bodyTypeLabel(raw.type, locale);
 
   return (
     <aside
       className="x-panel pointer-events-auto absolute right-4 top-36 z-20 hidden max-h-[calc(100dvh-12rem)] w-[min(100%-2rem,300px)] flex-col overflow-hidden md:flex"
       role="dialog"
-      aria-label={`Info ${body.name}`}
+      aria-label={`${t("info")} ${body.name}`}
     >
       <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-4 py-3">
         <div className="min-w-0">
           <p className="x-label">
-            {typeLabel[body.type] ?? body.type}
+            {typeLbl}
             {parent ? ` / ${parent.name}` : ""}
           </p>
           <h2 className="mt-1 truncate text-[17px] font-medium tracking-tight text-white">
@@ -38,8 +45,8 @@ export function InfoPanel() {
             type="button"
             onClick={() => setShowInfoPanel(false)}
             className="x-btn x-btn-ghost h-8 w-8"
-            aria-label="Sembunyikan"
-            title="Hide"
+            aria-label={t("hide")}
+            title={t("hide")}
           >
             <HideIcon />
           </button>
@@ -50,15 +57,15 @@ export function InfoPanel() {
               selectBody(null);
             }}
             className="x-btn x-btn-ghost h-8 w-8"
-            aria-label="Tutup"
-            title="Close"
+            aria-label={t("close")}
+            title={t("close")}
           >
             <CloseIcon />
           </button>
         </div>
       </div>
       <div className="panel-scroll min-h-0 flex-1 px-4 py-3">
-        <InfoBody body={body} />
+        <InfoBody body={raw} />
       </div>
     </aside>
   );

@@ -3,25 +3,35 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { celestialBodies } from "@/data/celestialBodies";
 import { useSimulationStore } from "@/store/useSimulationStore";
+import { useLocaleStore, useT } from "@/store/useLocaleStore";
+import { localizeBody } from "@/i18n/localize";
+import { bodiesEn } from "@/i18n/bodies-en";
 
 export function SearchBar({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const focusBody = useSimulationStore((s) => s.focusBody);
+  const locale = useLocaleStore((s) => s.locale);
+  const t = useT();
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return celestialBodies.slice(0, 8);
+    const localized = celestialBodies.map((b) => localizeBody(b, locale));
+    if (!q) return localized.slice(0, 8);
     return celestialBodies
-      .filter(
-        (b) =>
+      .filter((b) => {
+        const en = bodiesEn[b.id];
+        return (
           b.name.toLowerCase().includes(q) ||
           b.id.includes(q) ||
-          b.type.includes(q),
-      )
+          b.type.includes(q) ||
+          (en?.name.toLowerCase().includes(q) ?? false)
+        );
+      })
+      .map((b) => localizeBody(b, locale))
       .slice(0, 10);
-  }, [query]);
+  }, [query, locale]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -47,10 +57,10 @@ export function SearchBar({ compact = false }: { compact?: boolean }) {
         className={`x-btn gap-1.5 text-white/60 ${
           compact ? "h-8 px-2 text-xs" : "h-9 px-3 text-sm"
         }`}
-        aria-label="Cari objek"
+        aria-label={t("search")}
       >
         <SearchIcon />
-        <span className="hidden sm:inline">Cari objek…</span>
+        <span className="hidden sm:inline">{t("search")}</span>
         <kbd className="ml-1 hidden rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40 md:inline">
           ⌘K
         </kbd>
@@ -70,9 +80,9 @@ export function SearchBar({ compact = false }: { compact?: boolean }) {
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Planet, bulan…"
+                placeholder={t("searchPlaceholder")}
                 className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/35"
-                aria-label="Cari objek langit"
+                aria-label={t("search")}
                 autoFocus
               />
             </div>
@@ -101,7 +111,7 @@ export function SearchBar({ compact = false }: { compact?: boolean }) {
               ))}
               {results.length === 0 && (
                 <li className="px-3 py-4 text-center text-sm text-white/40">
-                  Tidak ditemukan
+                  {t("notFound")}
                 </li>
               )}
             </ul>
