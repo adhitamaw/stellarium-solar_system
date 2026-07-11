@@ -183,7 +183,10 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     const idx = guidedTour.findIndex((s) => s.targetId === id);
     set((s) => ({
       selectedId: id,
-      showInfoPanel: true,
+      // Keep hide preference when Prev/Next/Auto navigates.
+      // Only open panel on explicit pick (click / search / deep link).
+      showInfoPanel:
+        source === "tour" ? s.showInfoPanel : true,
       focusRequestId: s.focusRequestId + 1,
       // Manual pick locks view — stop Auto only
       tourAuto: source === "tour" ? s.tourAuto : false,
