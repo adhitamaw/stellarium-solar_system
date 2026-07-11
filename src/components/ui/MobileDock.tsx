@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { guidedTour } from "@/data/tours";
 import { bodyById } from "@/data/celestialBodies";
 import {
@@ -8,17 +9,16 @@ import {
   useSimulationStore,
 } from "@/store/useSimulationStore";
 import { simClock } from "@/lib/simClock";
-import { useEffect } from "react";
+import { InfoBody, typeLabel } from "./InfoContent";
 
 const SPEEDS = SPEED_PRESETS.filter((p) =>
   [1, 5_000, 10_000, 100_000, 1_000_000].includes(p.value),
 );
 
 /**
- * Single bottom dock for mobile portrait:
- * 1) Planet nav (prev / name / next / auto)
- * 2) Play + speed chips
- * Keeps the rest of the screen clean for 3D.
+ * Mobile bottom stack (single column, natural flex — no absolute cut-off):
+ * 1) Optional scrollable info sheet
+ * 2) Nav + time dock
  */
 export function MobileDock() {
   const tourStepIndex = useSimulationStore((s) => s.tourStepIndex);
@@ -31,10 +31,10 @@ export function MobileDock() {
   const speed = useSimulationStore((s) => s.speed);
   const setSpeed = useSimulationStore((s) => s.setSpeed);
   const simDays = useSimulationStore((s) => s.simDaysUi);
-  const setSimDays = useSimulationStore((s) => s.setSimDays);
   const selectedId = useSimulationStore((s) => s.selectedId);
   const showInfoPanel = useSimulationStore((s) => s.showInfoPanel);
   const setShowInfoPanel = useSimulationStore((s) => s.setShowInfoPanel);
+  const selectBody = useSimulationStore((s) => s.selectBody);
 
   useEffect(() => {
     const current = useSimulationStore.getState().speed;
@@ -46,26 +46,82 @@ export function MobileDock() {
   }, [setSpeed]);
 
   const step = guidedTour[tourStepIndex] ?? guidedTour[0];
-  const body = step ? bodyById[step.targetId] : null;
-  const name = body?.name ?? "—";
+  const navBody = step ? bodyById[step.targetId] : null;
+  const name = navBody?.name ?? "—";
   const total = guidedTour.length;
   const atStart = tourStepIndex <= 0;
   const atEnd = tourStepIndex >= total - 1;
-
   const date = formatSimDate(simDays);
   const selectedBody = selectedId ? bodyById[selectedId] : null;
 
   return (
     <div
-      className="pointer-events-auto absolute inset-x-0 bottom-0 z-30 md:hidden"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex max-h-[100dvh] flex-col justify-end md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <div className="mx-2 mb-2 space-y-1.5">
-        {/* Selected body quick info toggle */}
-        {selectedBody && (
+      <div className="pointer-events-auto mx-2 mb-2 flex min-h-0 max-h-[min(92dvh,100%)] flex-col gap-1.5">
+        {/* ── Scrollable info sheet (above dock) ── */}
+        {selectedBody && showInfoPanel && (
+          <aside
+            className="flex min-h-0 max-h-[min(52dvh,420px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl"
+            role="dialog"
+            aria-label={`Info ${selectedBody.name}`}
+          >
+            {/* Fixed header */}
+            <div className="flex shrink-0 items-start justify-between gap-2 border-b border-white/8 px-3 pb-2 pt-2.5">
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-300/80">
+                  {typeLabel[selectedBody.type] ?? selectedBody.type}
+                  {selectedBody.parentId && bodyById[selectedBody.parentId]
+                    ? ` · ${bodyById[selectedBody.parentId].name}`
+                    : ""}
+                </p>
+                <h2 className="truncate text-base font-semibold text-white">
+                  {selectedBody.name}
+                </h2>
+              </div>
+              <div className="flex shrink-0 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setShowInfoPanel(false)}
+                  className="rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-white/60 active:bg-white/10"
+                >
+                  Hide
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowInfoPanel(false);
+                    selectBody(null);
+                  }}
+                  className="rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-white/60 active:bg-white/10"
+                  aria-label="Tutup"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Scroll body — min-h-0 + flex-1 = actual iOS scroll */}
+            <div
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2.5"
+              style={{
+                WebkitOverflowScrolling: "touch",
+                touchAction: "pan-y",
+              }}
+            >
+              <InfoBody body={selectedBody} compact />
+              {/* spacer so last lines aren’t flush */}
+              <div className="h-2" />
+            </div>
+          </aside>
+        )}
+
+        {/* Chip when selected but hidden */}
+        {selectedBody && !showInfoPanel && (
           <button
             type="button"
-            onClick={() => setShowInfoPanel(!showInfoPanel)}
+            onClick={() => setShowInfoPanel(true)}
             className="flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/90 px-3 py-2 text-left shadow-lg backdrop-blur-xl"
           >
             <span
@@ -76,14 +132,13 @@ export function MobileDock() {
               {selectedBody.name}
             </span>
             <span className="text-[10px] uppercase tracking-wider text-sky-300/80">
-              {showInfoPanel ? "Tutup info" : "Info"}
+              Info
             </span>
           </button>
         )}
 
-        {/* Unified glass dock */}
-        <div className="rounded-2xl border border-white/10 bg-slate-950/92 p-2 shadow-2xl backdrop-blur-xl">
-          {/* Nav */}
+        {/* Nav + time dock (always visible, never clipped by info) */}
+        <div className="shrink-0 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl backdrop-blur-xl">
           <div className="flex items-center gap-1.5">
             <DockIconBtn
               label="Sebelumnya"
@@ -115,7 +170,7 @@ export function MobileDock() {
               role="switch"
               aria-checked={tourAuto}
               onClick={() => setTourAuto(!tourAuto)}
-              className={`flex h-10 shrink-0 items-center gap-1 rounded-xl px-2.5 text-[11px] font-semibold ${
+              className={`flex h-10 shrink-0 items-center rounded-xl px-2.5 text-[11px] font-semibold ${
                 tourAuto
                   ? "bg-violet-500/35 text-violet-50 ring-1 ring-violet-400/40"
                   : "bg-white/5 text-white/50"
@@ -125,7 +180,6 @@ export function MobileDock() {
             </button>
           </div>
 
-          {/* Time / speed */}
           <div className="mt-1.5 flex items-center gap-1.5 border-t border-white/8 pt-1.5">
             <DockIconBtn
               label={isPlaying ? "Jeda" : "Putar"}

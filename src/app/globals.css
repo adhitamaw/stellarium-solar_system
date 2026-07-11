@@ -93,3 +93,11 @@ input[type="range"]::-moz-range-thumb {
 .chip-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* iOS-safe vertical scroll inside panels */
+.panel-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
