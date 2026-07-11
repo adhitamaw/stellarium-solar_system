@@ -48,100 +48,102 @@ export function MoreMenu({
     <div className="pointer-events-auto absolute inset-0 z-40 md:hidden">
       <button
         type="button"
-        className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
-        aria-label="Tutup menu"
+        className="absolute inset-0 bg-black/70"
+        aria-label="Close menu"
         onClick={onClose}
       />
       <div
-        className="absolute inset-x-0 bottom-0 max-h-[min(78dvh,560px)] overflow-y-auto rounded-t-3xl border border-white/10 bg-slate-950/95 px-4 pb-6 pt-3 shadow-2xl"
+        className="absolute inset-x-0 bottom-0 max-h-[min(78dvh,560px)] overflow-y-auto border-t border-white/12 bg-black px-4 pb-6 pt-3"
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/20" />
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-white">Menu</h2>
+        <div className="mx-auto mb-4 h-px w-10 bg-white/25" />
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-[13px] font-medium tracking-wide text-white">
+            Systems
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-xs text-white/50"
+            className="x-btn h-8 px-3 text-[10px] uppercase tracking-[0.12em]"
           >
-            Tutup
+            Close
           </button>
         </div>
 
-        <Section title="Kamera">
-          <RowBtns
+        <Section title="Camera">
+          <Seg
             items={[
               { id: "orbit", label: "Orbit" },
-              { id: "fly", label: "Terbang" },
+              { id: "fly", label: "Fly" },
             ]}
             value={cameraMode}
             onChange={(v) => setCameraMode(v as "orbit" | "fly")}
           />
         </Section>
 
-        <Section title="Tampilan">
-          <RowBtns
+        <Section title="Display">
+          <Seg
             items={[
-              { id: "visible", label: "Skala jelas" },
-              { id: "realistic", label: "Skala real" },
+              { id: "visible", label: "Clear scale" },
+              { id: "realistic", label: "Real scale" },
             ]}
             value={scaleMode}
             onChange={(v) => setScaleMode(v as "visible" | "realistic")}
           />
           <div className="mt-2 flex gap-2">
-            <ToggleChip active={showOrbits} onClick={toggleOrbits}>
-              Garis orbit
-            </ToggleChip>
-            <ToggleChip active={showLabels} onClick={toggleLabels}>
-              Label
-            </ToggleChip>
+            <Toggle active={showOrbits} onClick={toggleOrbits}>
+              Orbits
+            </Toggle>
+            <Toggle active={showLabels} onClick={toggleLabels}>
+              Labels
+            </Toggle>
           </div>
         </Section>
 
-        <Section title="Kualitas">
-          <RowBtns
+        <Section title="Quality">
+          <Seg
             items={[
-              { id: "performance", label: "Ringan" },
-              { id: "balanced", label: "Seimbang" },
+              { id: "performance", label: "Lite" },
+              { id: "balanced", label: "Balanced" },
               { id: "ultra", label: "Ultra" },
             ]}
             value={quality}
             onChange={(v) => setQuality(v as QualityPreset)}
           />
-          <p className="mt-1.5 font-mono text-[11px] text-white/40">
+          <p className="mt-2 font-mono text-[11px] tabular-nums text-white/30">
             {fps > 0 ? `${fps} FPS` : "— FPS"}
           </p>
         </Section>
 
-        <Section title="Aksi">
+        <Section title="Actions">
           <div className="grid grid-cols-2 gap-2">
-            <ActionBtn onClick={() => void onAudio()}>
-              {audioEnabled ? "🔊 Suara ON" : "🔇 Suara OFF"}
-            </ActionBtn>
-            <ActionBtn
+            <Action onClick={() => void onAudio()}>
+              {audioEnabled ? "Audio · ON" : "Audio · OFF"}
+            </Action>
+            <Action
               onClick={async () => {
                 await copyFocusLink(selectedId ?? "earth");
                 onClose();
               }}
             >
-              🔗 Bagikan
-            </ActionBtn>
-            <ActionBtn
+              Share link
+            </Action>
+            <Action
               onClick={() => {
                 toggleCompareMode();
                 onClose();
               }}
             >
-              ⚖ Banding
-            </ActionBtn>
-            <ActionBtn
+              Compare
+            </Action>
+            <Action
               onClick={() => {
                 requestCapture();
                 onClose();
               }}
             >
-              📷 Capture
-            </ActionBtn>
+              Capture
+            </Action>
           </div>
         </Section>
       </div>
@@ -157,16 +159,14 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-4">
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">
-        {title}
-      </p>
+    <div className="mb-5">
+      <p className="x-label mb-2.5">{title}</p>
       {children}
     </div>
   );
 }
 
-function RowBtns({
+function Seg({
   items,
   value,
   onChange,
@@ -182,10 +182,8 @@ function RowBtns({
           key={o.id}
           type="button"
           onClick={() => onChange(o.id)}
-          className={`rounded-xl px-3 py-2 text-xs font-medium ${
-            value === o.id
-              ? "bg-white/15 text-white"
-              : "bg-white/5 text-white/55"
+          className={`x-btn h-9 px-3 text-[11px] ${
+            value === o.id ? "x-btn-primary" : ""
           }`}
         >
           {o.label}
@@ -195,7 +193,7 @@ function RowBtns({
   );
 }
 
-function ToggleChip({
+function Toggle({
   children,
   active,
   onClick,
@@ -208,18 +206,14 @@ function ToggleChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl px-3 py-2 text-xs font-medium ${
-        active
-          ? "bg-sky-500/25 text-sky-100 ring-1 ring-sky-400/30"
-          : "bg-white/5 text-white/55"
-      }`}
+      className={`x-btn h-9 px-3 text-[11px] ${active ? "x-btn-primary" : ""}`}
     >
       {children}
     </button>
   );
 }
 
-function ActionBtn({
+function Action({
   children,
   onClick,
 }: {
@@ -230,7 +224,7 @@ function ActionBtn({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left text-xs font-medium text-white/80 active:bg-white/10"
+      className="x-btn h-11 justify-start px-3 text-left text-[12px] tracking-wide"
     >
       {children}
     </button>

@@ -36,90 +36,71 @@ export function FinishingBar() {
     window.setTimeout(() => setShareMsg(null), 1800);
   };
 
-  const btn =
-    "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[11px] font-medium transition sm:h-auto sm:rounded-xl sm:px-2.5 sm:py-1.5 sm:text-xs";
-
   return (
     <div className="pointer-events-auto flex flex-col items-end gap-1">
-      <div className="flex max-w-[100%] flex-wrap items-center justify-end gap-1 rounded-xl border border-white/10 bg-slate-950/80 p-1 shadow-xl backdrop-blur-xl sm:gap-1.5 sm:rounded-2xl sm:p-1.5">
+      <div className="x-panel flex max-w-[100%] flex-wrap items-center justify-end gap-1 p-1">
         <button
           type="button"
           onClick={() => void onToggleAudio()}
-          className={`${btn} ${
-            audioEnabled
-              ? "bg-emerald-500/25 text-emerald-100 ring-1 ring-emerald-400/40"
-              : "bg-white/5 text-white/70"
+          className={`x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em] ${
+            audioEnabled ? "x-btn-primary" : ""
           }`}
-          title="Suara"
-          aria-label="Toggle suara"
+          title="Audio"
         >
-          <span className="sm:hidden">{audioEnabled ? "🔊" : "🔇"}</span>
-          <span className="hidden sm:inline">
-            {audioEnabled ? "🔊 ON" : "🔇 Suara"}
-          </span>
+          {audioEnabled ? "Audio ON" : "Audio"}
         </button>
 
         <button
           type="button"
           onClick={() => void onShare()}
-          className={`${btn} text-white/55 hover:bg-white/10 hover:text-white`}
+          className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
           title="Share"
-          aria-label="Share link"
         >
-          <span className="sm:hidden">🔗</span>
-          <span className="hidden sm:inline">🔗 Share</span>
+          Share
         </button>
 
         <button
           type="button"
           onClick={toggleCompareMode}
-          className={`${btn} ${
-            compareMode
-              ? "bg-amber-500/25 text-amber-100 ring-1 ring-amber-400/35"
-              : "text-white/55 hover:bg-white/10"
+          className={`x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em] ${
+            compareMode ? "x-btn-primary" : ""
           }`}
-          title="Banding"
-          aria-label="Banding ukuran"
+          title="Compare"
         >
-          <span className="sm:hidden">⚖</span>
-          <span className="hidden sm:inline">⚖ Banding</span>
+          Compare
         </button>
 
         <button
           type="button"
           onClick={requestCapture}
-          className={`${btn} text-white/55 hover:bg-white/10 hover:text-white`}
+          className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
           title="Capture"
-          aria-label="Screenshot"
         >
-          <span className="sm:hidden">📷</span>
-          <span className="hidden sm:inline">📷 Capture</span>
+          Capture
         </button>
 
         <button
           type="button"
           onClick={() => setAutoQuality(!autoQuality)}
-          className={`${btn} hidden sm:inline-flex ${
-            autoQuality
-              ? "bg-sky-500/20 text-sky-100 ring-1 ring-sky-400/30"
-              : "text-white/45 hover:bg-white/10"
+          className={`x-btn hidden h-8 px-2.5 text-[10px] uppercase tracking-[0.1em] sm:inline-flex ${
+            autoQuality ? "x-btn-primary" : ""
           }`}
           title="Auto quality"
         >
-          {autoQuality ? "AUTO" : "Manual"}
+          {autoQuality ? "Auto Q" : "Manual"}
         </button>
 
         <button
           type="button"
           onClick={() => setShowShortcuts(!showShortcuts)}
-          className={`${btn} hidden text-white/40 hover:bg-white/10 sm:inline-flex`}
-          title="Shortcuts"
+          className="x-btn hidden h-8 w-8 sm:inline-flex"
+          title="Help"
         >
           ?
         </button>
       </div>
       {shareMsg && (
-        <span className="rounded-lg bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-100 ring-1 ring-emerald-400/30">
+        <span className="border border-white/15 bg-black px-2 py-0.5 font-mono text-[10px] text-white/70">
           {shareMsg}
         </span>
       )}

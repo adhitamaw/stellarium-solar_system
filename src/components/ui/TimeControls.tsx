@@ -1,29 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import { simClock } from "@/lib/simClock";
 import {
   DEFAULT_SPEED,
   SPEED_PRESETS,
   useSimulationStore,
 } from "@/store/useSimulationStore";
-import { useEffect } from "react";
 
 function formatSimDate(simDays: number): string {
   const epoch = new Date(Date.UTC(2000, 0, 1, 12));
-  const ms = epoch.getTime() + simDays * 86_400_000;
-  const d = new Date(ms);
-  return d.toLocaleDateString("id-ID", {
-    year: "numeric",
+  const d = new Date(epoch.getTime() + simDays * 86_400_000);
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
     month: "short",
-    day: "numeric",
+    year: "numeric",
     timeZone: "UTC",
   });
 }
-
-/** Fewer presets on tiny screens */
-const MOBILE_SPEEDS = SPEED_PRESETS.filter((p) =>
-  [1, 1_000, 5_000, 10_000, 100_000, 1_000_000].includes(p.value),
-);
 
 export function TimeControls() {
   const simDays = useSimulationStore((s) => s.simDaysUi);
@@ -40,73 +34,69 @@ export function TimeControls() {
     else simClock.speed = current;
   }, [setSpeed]);
 
-  const jump = (days: number) => {
-    setSimDays(simClock.days + days);
-  };
+  const jump = (days: number) => setSimDays(simClock.days + days);
 
   return (
-    <div className="pointer-events-auto rounded-xl border border-white/10 bg-slate-950/85 px-2 py-2 shadow-xl backdrop-blur-xl sm:rounded-2xl sm:px-3 sm:py-2.5">
-      {/* Row 1: transport + date */}
-      <div className="flex items-center gap-2">
-        <div className="flex shrink-0 items-center gap-1">
-          <IconButton label="Mundur 30 hari" onClick={() => jump(-30)}>
+    <div className="x-panel pointer-events-auto px-3 py-2.5">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="x-btn h-8 w-8"
+            onClick={() => jump(-30)}
+            aria-label="Back 30 days"
+          >
             <SkipIcon dir="back" />
-          </IconButton>
-          <IconButton
-            label={isPlaying ? "Jeda" : "Putar"}
+          </button>
+          <button
+            type="button"
+            className={`x-btn h-8 w-8 ${isPlaying ? "" : "x-btn-primary"}`}
             onClick={togglePlay}
-            primary
+            aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
-          </IconButton>
-          <IconButton label="Maju 30 hari" onClick={() => jump(30)}>
+          </button>
+          <button
+            type="button"
+            className="x-btn h-8 w-8"
+            onClick={() => jump(30)}
+            aria-label="Forward 30 days"
+          >
             <SkipIcon dir="fwd" />
-          </IconButton>
-          <IconButton label="Reset" onClick={() => setSimDays(0)}>
+          </button>
+          <button
+            type="button"
+            className="x-btn h-8 w-8"
+            onClick={() => setSimDays(0)}
+            aria-label="Reset"
+          >
             <ResetIcon />
-          </IconButton>
+          </button>
         </div>
 
-        <div className="min-w-0 flex-1">
-          <p className="hidden text-[9px] font-medium uppercase tracking-wider text-white/40 sm:block">
-            Waktu simulasi
-          </p>
-          <p className="truncate font-mono text-xs text-sky-100 tabular-nums sm:text-sm">
+        <div className="min-w-[6.5rem]">
+          <p className="x-label">Epoch</p>
+          <p className="mt-0.5 font-mono text-[13px] tabular-nums tracking-tight text-white">
             {formatSimDate(simDays)}
           </p>
         </div>
-      </div>
 
-      {/* Row 2: speed chips scrollable */}
-      <div className="chip-scroll mt-1.5 flex items-center gap-1 sm:mt-2 sm:flex-wrap">
-        <span className="shrink-0 text-[9px] font-medium uppercase tracking-wider text-white/40">
-          Speed
-        </span>
-        {/* mobile subset */}
-        <div className="flex items-center gap-1 sm:hidden">
-          {MOBILE_SPEEDS.map((p) => (
-            <SpeedChip
-              key={p.value}
-              label={p.label}
-              active={speed === p.value}
-              onClick={() => setSpeed(p.value)}
-            />
-          ))}
-        </div>
-        <div className="hidden items-center gap-1 sm:flex sm:flex-wrap">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+          <span className="x-label mr-1">Speed</span>
           {SPEED_PRESETS.map((p) => (
-            <SpeedChip
+            <button
               key={p.value}
-              label={p.label}
-              active={speed === p.value}
+              type="button"
               onClick={() => setSpeed(p.value)}
-            />
+              className={`x-chip ${speed === p.value ? "is-active" : ""}`}
+            >
+              {p.label}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Row 3: scrub — full width */}
-      <div className="mt-1.5 flex items-center sm:mt-2">
+      <div className="mt-2.5">
         <input
           type="range"
           min={0}
@@ -114,77 +104,24 @@ export function TimeControls() {
           step={1}
           value={((simDays % (365.25 * 50)) + 365.25 * 50) % (365.25 * 50)}
           onChange={(e) => setSimDays(Number(e.target.value))}
-          className="h-1 w-full cursor-pointer accent-sky-400"
-          aria-label="Scrub waktu simulasi"
+          className="h-1 w-full cursor-pointer accent-white"
+          aria-label="Time scrub"
         />
       </div>
     </div>
   );
 }
 
-function SpeedChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium transition sm:text-[11px] ${
-        active
-          ? "bg-sky-500/35 text-sky-50 ring-1 ring-sky-400/50"
-          : "text-white/50 hover:bg-white/10 hover:text-white/80"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-function IconButton({
-  children,
-  onClick,
-  label,
-  primary,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  label: string;
-  primary?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className={`flex h-9 w-9 items-center justify-center rounded-lg transition sm:h-8 sm:w-8 ${
-        primary
-          ? "bg-sky-500/25 text-sky-100 ring-1 ring-sky-400/30"
-          : "text-white/70 hover:bg-white/10"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
 function PlayIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
       <path d="M8 5v14l11-7z" />
     </svg>
   );
 }
 function PauseIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
       <path d="M6 5h4v14H6zm8 0h4v14h-4z" />
     </svg>
   );
@@ -192,8 +129,8 @@ function PauseIcon() {
 function SkipIcon({ dir }: { dir: "back" | "fwd" }) {
   return (
     <svg
-      width="14"
-      height="14"
+      width="12"
+      height="12"
       viewBox="0 0 24 24"
       fill="currentColor"
       className={dir === "back" ? "rotate-180" : ""}
@@ -205,12 +142,12 @@ function SkipIcon({ dir }: { dir: "back" | "fwd" }) {
 function ResetIcon() {
   return (
     <svg
-      width="14"
-      height="14"
+      width="12"
+      height="12"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.75"
     >
       <path d="M3 12a9 9 0 1 0 3-6.7" strokeLinecap="round" />
       <path d="M3 4v5h5" strokeLinecap="round" strokeLinejoin="round" />

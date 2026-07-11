@@ -50,7 +50,7 @@ export function HUD() {
 
       {/* ─── MOBILE TOP ─── */}
       <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 flex items-center justify-between gap-2 px-3 pt-2 md:hidden">
-        <p className="pointer-events-none text-[10px] font-semibold uppercase tracking-[0.22em] text-sky-300/75">
+        <p className="pointer-events-none text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">
           Stellarium
         </p>
         <div className="pointer-events-auto flex items-center gap-1.5">
@@ -58,8 +58,8 @@ export function HUD() {
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-slate-950/80 text-white/80 shadow-lg backdrop-blur-xl"
-            aria-label="Buka menu"
+            className="x-btn h-8 w-8"
+            aria-label="Open menu"
           >
             <MenuIcon />
           </button>
@@ -69,13 +69,11 @@ export function HUD() {
       {/* ─── DESKTOP TOP ─── */}
       <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 hidden items-start justify-between gap-3 p-4 md:flex">
         <div className="pointer-events-none">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-300/70">
-            Stellarium Cinematic
+          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">
+            Stellarium
           </p>
-          <p className="text-xs text-white/40">
-            {compareMode
-              ? "Mode banding ukuran"
-              : "Simulator Tata Surya Interaktif"}
+          <p className="mt-0.5 text-[12px] text-white/25">
+            {compareMode ? "Compare" : "Solar system"}
           </p>
         </div>
         <div className="pointer-events-auto flex flex-col items-end gap-2">

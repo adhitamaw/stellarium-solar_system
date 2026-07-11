@@ -44,10 +44,8 @@ export function SearchBar({ compact = false }: { compact?: boolean }) {
           setOpen(true);
           setTimeout(() => inputRef.current?.focus(), 0);
         }}
-        className={`flex items-center gap-1.5 border border-white/10 bg-slate-950/80 text-white/60 shadow-lg backdrop-blur-xl transition hover:border-white/20 hover:text-white/90 ${
-          compact
-            ? "h-8 rounded-lg px-2 text-xs"
-            : "rounded-xl px-3 py-2 text-sm"
+        className={`x-btn gap-1.5 text-white/60 ${
+          compact ? "h-8 px-2 text-xs" : "h-9 px-3 text-sm"
         }`}
         aria-label="Cari objek"
       >
@@ -65,8 +63,8 @@ export function SearchBar({ compact = false }: { compact?: boolean }) {
             onClick={() => setOpen(false)}
             aria-hidden
           />
-          <div className="absolute right-0 top-0 z-40 w-[min(100vw-1rem,300px)] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
+          <div className="x-panel absolute right-0 top-0 z-40 w-[min(100vw-1rem,300px)] overflow-hidden">
+            <div className="flex items-center gap-2 border-b border-white/[0.08] px-3 py-2">
               <SearchIcon />
               <input
                 ref={inputRef}

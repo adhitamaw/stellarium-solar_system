@@ -15,11 +15,7 @@ const SPEEDS = SPEED_PRESETS.filter((p) =>
   [1, 5_000, 10_000, 100_000, 1_000_000].includes(p.value),
 );
 
-/**
- * Mobile bottom stack (single column, natural flex — no absolute cut-off):
- * 1) Optional scrollable info sheet
- * 2) Nav + time dock
- */
+/** Mobile dock — SpaceX / xAI black control surface */
 export function MobileDock() {
   const tourStepIndex = useSimulationStore((s) => s.tourStepIndex);
   const tourAuto = useSimulationStore((s) => s.tourAuto);
@@ -60,23 +56,21 @@ export function MobileDock() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="pointer-events-auto mx-2 mb-2 flex min-h-0 max-h-[min(92dvh,100%)] flex-col gap-1.5">
-        {/* ── Scrollable info sheet (above dock) ── */}
         {selectedBody && showInfoPanel && (
           <aside
-            className="flex min-h-0 max-h-[min(52dvh,420px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl"
+            className="x-panel flex min-h-0 max-h-[min(52dvh,420px)] flex-col overflow-hidden"
             role="dialog"
             aria-label={`Info ${selectedBody.name}`}
           >
-            {/* Fixed header */}
-            <div className="flex shrink-0 items-start justify-between gap-2 border-b border-white/8 px-3 pb-2 pt-2.5">
+            <div className="flex shrink-0 items-start justify-between gap-2 border-b border-white/[0.08] px-3 py-2.5">
               <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-300/80">
+                <p className="x-label">
                   {typeLabel[selectedBody.type] ?? selectedBody.type}
                   {selectedBody.parentId && bodyById[selectedBody.parentId]
-                    ? ` · ${bodyById[selectedBody.parentId].name}`
+                    ? ` / ${bodyById[selectedBody.parentId].name}`
                     : ""}
                 </p>
-                <h2 className="truncate text-base font-semibold text-white">
+                <h2 className="mt-0.5 truncate text-[15px] font-medium tracking-tight text-white">
                   {selectedBody.name}
                 </h2>
               </div>
@@ -84,7 +78,7 @@ export function MobileDock() {
                 <button
                   type="button"
                   onClick={() => setShowInfoPanel(false)}
-                  className="rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-white/60 active:bg-white/10"
+                  className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
                 >
                   Hide
                 </button>
@@ -94,116 +88,99 @@ export function MobileDock() {
                     setShowInfoPanel(false);
                     selectBody(null);
                   }}
-                  className="rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-white/60 active:bg-white/10"
-                  aria-label="Tutup"
+                  className="x-btn x-btn-ghost h-8 w-8"
+                  aria-label="Close"
                 >
                   ✕
                 </button>
               </div>
             </div>
 
-            {/* Scroll body — min-h-0 + flex-1 = actual iOS scroll */}
             <div
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2.5"
-              style={{
-                WebkitOverflowScrolling: "touch",
-                touchAction: "pan-y",
-              }}
+              className="panel-scroll min-h-0 flex-1 px-3 py-2.5"
+              style={{ WebkitOverflowScrolling: "touch" }}
             >
               <InfoBody body={selectedBody} compact />
-              {/* spacer so last lines aren’t flush */}
               <div className="h-2" />
             </div>
           </aside>
         )}
 
-        {/* Chip when selected but hidden */}
         {selectedBody && !showInfoPanel && (
           <button
             type="button"
             onClick={() => setShowInfoPanel(true)}
-            className="flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/90 px-3 py-2 text-left shadow-lg backdrop-blur-xl"
+            className="x-panel flex w-full items-center gap-3 px-3 py-2.5 text-left"
           >
-            <span
-              className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ background: selectedBody.color }}
-            />
-            <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
+            <span className="h-px w-4 shrink-0 bg-white/40" />
+            <span className="min-w-0 flex-1 truncate text-[13px] font-medium tracking-tight text-white">
               {selectedBody.name}
             </span>
-            <span className="text-[10px] uppercase tracking-wider text-sky-300/80">
-              Info
-            </span>
+            <span className="x-label">Info</span>
           </button>
         )}
 
-        {/* Nav + time dock (always visible, never clipped by info) */}
-        <div className="shrink-0 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl backdrop-blur-xl">
+        <div className="x-panel shrink-0 p-1.5">
           <div className="flex items-center gap-1.5">
-            <DockIconBtn
-              label="Sebelumnya"
+            <DockBtn
+              label="Previous"
               disabled={atStart}
               onClick={prevTourStep}
             >
               <Chevron dir="left" />
-            </DockIconBtn>
+            </DockBtn>
 
-            <div className="min-w-0 flex-1 rounded-xl bg-white/5 px-2 py-1.5 text-center">
-              <p className="truncate text-[13px] font-semibold text-white">
+            <div className="min-w-0 flex-1 border border-white/[0.08] bg-black/50 px-2 py-1.5 text-center">
+              <p className="truncate text-[13px] font-medium tracking-tight text-white">
                 {name}
               </p>
-              <p className="font-mono text-[10px] tabular-nums text-white/40">
-                {tourStepIndex + 1}/{total}
+              <p className="mt-0.5 font-mono text-[10px] tabular-nums tracking-wider text-white/28">
+                {String(tourStepIndex + 1).padStart(2, "0")} /{" "}
+                {String(total).padStart(2, "0")}
               </p>
             </div>
 
-            <DockIconBtn
-              label="Berikutnya"
+            <DockBtn
+              label="Next"
               disabled={atEnd && !tourAuto}
               onClick={nextTourStep}
             >
               <Chevron dir="right" />
-            </DockIconBtn>
+            </DockBtn>
 
             <button
               type="button"
               role="switch"
               aria-checked={tourAuto}
               onClick={() => setTourAuto(!tourAuto)}
-              className={`flex h-10 shrink-0 items-center rounded-xl px-2.5 text-[11px] font-semibold ${
-                tourAuto
-                  ? "bg-violet-500/35 text-violet-50 ring-1 ring-violet-400/40"
-                  : "bg-white/5 text-white/50"
+              className={`x-btn h-10 shrink-0 px-2.5 text-[10px] uppercase tracking-[0.12em] ${
+                tourAuto ? "x-btn-primary" : ""
               }`}
             >
               Auto
             </button>
           </div>
 
-          <div className="mt-1.5 flex items-center gap-1.5 border-t border-white/8 pt-1.5">
-            <DockIconBtn
-              label={isPlaying ? "Jeda" : "Putar"}
+          <div className="mt-1.5 flex items-center gap-1.5 border-t border-white/[0.06] pt-1.5">
+            <DockBtn
+              label={isPlaying ? "Pause" : "Play"}
               onClick={togglePlay}
               primary
             >
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
-            </DockIconBtn>
+            </DockBtn>
 
-            <p className="min-w-0 shrink truncate font-mono text-[10px] text-sky-100/90 tabular-nums">
+            <p className="min-w-0 shrink truncate font-mono text-[10px] tracking-wide text-white/40 tabular-nums">
               {date}
             </p>
 
-            <div className="chip-scroll flex min-w-0 flex-1 items-center gap-1">
+            <div className="chip-scroll flex min-w-0 flex-1 items-center gap-0.5">
               {SPEEDS.map((p) => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => setSpeed(p.value)}
-                  className={`shrink-0 rounded-md px-1.5 py-1 text-[10px] font-medium ${
-                    speed === p.value
-                      ? "bg-sky-500/35 text-sky-50 ring-1 ring-sky-400/45"
-                      : "text-white/45"
-                  }`}
+                  className={`x-chip ${speed === p.value ? "is-active" : ""}`}
                 >
                   {p.label}
                 </button>
@@ -216,7 +193,7 @@ export function MobileDock() {
   );
 }
 
-function DockIconBtn({
+function DockBtn({
   children,
   onClick,
   label,
@@ -235,10 +212,8 @@ function DockIconBtn({
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition active:scale-95 disabled:opacity-30 ${
-        primary
-          ? "bg-sky-500/30 text-sky-50 ring-1 ring-sky-400/35"
-          : "border border-white/10 text-white/85"
+      className={`x-btn h-10 w-10 shrink-0 active:scale-[0.97] ${
+        primary ? "x-btn-primary" : ""
       }`}
     >
       {children}
@@ -249,12 +224,12 @@ function DockIconBtn({
 function Chevron({ dir }: { dir: "left" | "right" }) {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.2"
+      strokeWidth="1.75"
       className={dir === "left" ? "rotate-180" : ""}
     >
       <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
@@ -264,14 +239,14 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 
 function PlayIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
       <path d="M8 5v14l11-7z" />
     </svg>
   );
 }
 function PauseIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
       <path d="M6 5h4v14H6zm8 0h4v14h-4z" />
     </svg>
   );
@@ -280,8 +255,8 @@ function PauseIcon() {
 function formatSimDate(simDays: number): string {
   const epoch = new Date(Date.UTC(2000, 0, 1, 12));
   const d = new Date(epoch.getTime() + simDays * 86_400_000);
-  return d.toLocaleDateString("id-ID", {
-    day: "numeric",
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
     month: "short",
     year: "numeric",
     timeZone: "UTC",
