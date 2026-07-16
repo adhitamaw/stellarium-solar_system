@@ -236,7 +236,7 @@ export const celestialBodies: CelestialBody[] = [
     color: "#c0c0c0",
     description:
       "Satelit alami Bumi. Stabilisasi sumbu rotasi Bumi dan penggerak pasang surut.",
-    composition: "Batuan silikat, regolith, inti besi kecil",
+    composition: "Batuan silikat, regolit, inti besi kecil",
     funFact: "Bulan menjauh dari Bumi sekitar 3,8 cm per tahun.",
   },
 
@@ -256,7 +256,7 @@ export const celestialBodies: CelestialBody[] = [
     color: "#8a7060",
     description:
       "Satelit Mars yang lebih besar dan lebih dekat. Bentuknya tidak bulat sempurna, mirip asteroid yang tertangkap.",
-    composition: "Batuan karbonaceous, regolith lepas, porus",
+    composition: "Batuan karbon, regolit lepas, berpori",
     funFact:
       "Phobos mengorbit lebih cepat dari rotasi Mars — terbit di barat, terbenam di timur.",
   },
@@ -275,7 +275,7 @@ export const celestialBodies: CelestialBody[] = [
     color: "#9a8878",
     description:
       "Satelit Mars yang lebih kecil dan lebih jauh. Permukaan lebih halus karena regolith menutupi kawah.",
-    composition: "Batuan tipe-C, regolith",
+    composition: "Batuan tipe-C, regolit",
     funFact:
       "Dari permukaan Mars, Deimos tampak seperti bintang redup yang bergerak lambat di langit.",
   },
@@ -366,7 +366,7 @@ export const celestialBodies: CelestialBody[] = [
     color: "#6b5c4c",
     description: "Permukaan paling berkawah di tata surya. Relatif tenang secara geologis.",
     composition: "Es air dan batuan",
-    funFact: "Callisto tidak berada di resonansi orbit seperti tiga bulan Galilean lainnya.",
+    funFact: "Callisto tidak berada di resonansi orbit seperti tiga bulan Galilea lainnya.",
   },
   {
     id: "himalia",
@@ -384,7 +384,7 @@ export const celestialBodies: CelestialBody[] = [
     description:
       "Bulan luar Jupiter yang besar (kelompok Himalia). Orbit miring, kemungkinan asteroid yang tertangkap.",
     composition: "Batuan tipe-C",
-    funFact: "Himalia adalah bulan non-Galilean terbesar Jupiter.",
+    funFact: "Himalia adalah bulan non-Galilea terbesar Jupiter.",
   },
 
   // Saturn — major icy moons
@@ -402,7 +402,7 @@ export const celestialBodies: CelestialBody[] = [
     phaseOffset: 0.12,
     color: "#d8d4cc",
     description:
-      "Bulan kecil Saturnus dengan kawah Herschel raksasa — sering dijuluki mirip Death Star.",
+      "Bulan kecil Saturnus dengan kawah Herschel raksasa — sering dijuluki mirip Death Star (film Star Wars).",
     composition: "Es air hampir murni",
     funFact: "Kawah Herschel selebar sepertiga diameter Mimas.",
   },
@@ -679,13 +679,8 @@ export function getChildren(parentId: string): CelestialBody[] {
   return celestialBodies.filter((b) => b.parentId === parentId);
 }
 
-export function formatDistance(au: number | undefined): string {
-  if (au === undefined || au === 0) return "—";
-  if (au < 0.01) return `${(au * 149_597_870.7).toFixed(0)} km`;
-  return `${au.toFixed(3)} AU`;
-}
-
-export function formatRadius(km: number): string {
-  if (km >= 1_000) return `${(km / 1_000).toFixed(1)} ribu km`;
-  return `${km.toFixed(1)} km`;
-}
+/** @deprecated Prefer `@/i18n/format` with locale */
+export {
+  formatDistance,
+  formatRadius,
+} from "@/i18n/format";

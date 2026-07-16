@@ -1,10 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
-import { bodyById, formatDistance, formatRadius } from "@/data/celestialBodies";
+import { bodyById } from "@/data/celestialBodies";
 import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLocaleStore, useT } from "@/store/useLocaleStore";
 import { localizeBody } from "@/i18n/localize";
+import {
+  formatDistance,
+  formatRadius,
+  formatThousandKm,
+} from "@/i18n/format";
 
 /** Live chip for selected body (F7) */
 export function DistanceChip() {
@@ -32,16 +37,19 @@ export function DistanceChip() {
   if (raw.type === "star") {
     distLabel = t("systemCenter");
   } else if (parent && raw.type === "moon") {
-    distLabel = `${(raw.orbitRadius / 1000).toFixed(0)} ${t("thousandKm")} ${t("from")} ${parent.name}`;
+    distLabel = `${formatThousandKm(raw.orbitRadius, locale)} ${t("from")} ${parent.name}`;
   } else {
-    distLabel = `${formatDistance(raw.distanceAu)} ${t("from")} ${sun?.name ?? "Sun"}`;
+    const sunName = sun?.name ?? (locale === "id" ? "Matahari" : "Sun");
+    distLabel = `${formatDistance(raw.distanceAu, locale)} ${t("from")} ${sunName}`;
   }
 
   return (
     <div className="pointer-events-none rounded-xl border border-white/10 bg-slate-950/65 px-3 py-2 text-[11px] text-white/70 shadow-lg backdrop-blur-md">
       <span className="font-medium text-white">{b.name}</span>
       <span className="mx-1.5 text-white/25">·</span>
-      <span>R {formatRadius(raw.radiusKm)}</span>
+      <span>
+        {t("radiusAbbrev")} {formatRadius(raw.radiusKm, locale)}
+      </span>
       <span className="mx-1.5 text-white/25">·</span>
       <span>{distLabel}</span>
     </div>

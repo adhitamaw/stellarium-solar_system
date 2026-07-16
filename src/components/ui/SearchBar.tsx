@@ -4,7 +4,7 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { celestialBodies } from "@/data/celestialBodies";
 import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLocaleStore, useT } from "@/store/useLocaleStore";
-import { localizeBody } from "@/i18n/localize";
+import { localizeBody, bodyTypeLabel } from "@/i18n/localize";
 import { bodiesEn } from "@/i18n/bodies-en";
 
 export function SearchBar({ compact = false }: { compact?: boolean }) {
@@ -22,10 +22,14 @@ export function SearchBar({ compact = false }: { compact?: boolean }) {
     return celestialBodies
       .filter((b) => {
         const en = bodiesEn[b.id];
+        const typeId = bodyTypeLabel(b.type, "id").toLowerCase();
+        const typeEn = bodyTypeLabel(b.type, "en").toLowerCase();
         return (
           b.name.toLowerCase().includes(q) ||
           b.id.includes(q) ||
           b.type.includes(q) ||
+          typeId.includes(q) ||
+          typeEn.includes(q) ||
           (en?.name.toLowerCase().includes(q) ?? false)
         );
       })
@@ -104,7 +108,7 @@ export function SearchBar({ compact = false }: { compact?: boolean }) {
                     />
                     <span className="text-white/90">{b.name}</span>
                     <span className="ml-auto text-[10px] uppercase tracking-wider text-white/35">
-                      {b.type}
+                      {bodyTypeLabel(b.type, locale)}
                     </span>
                   </button>
                 </li>

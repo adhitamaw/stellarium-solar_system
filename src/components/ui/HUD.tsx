@@ -53,20 +53,42 @@ export function HUD() {
 
       {/* ─── MOBILE TOP ─── */}
       <header className="pointer-events-none absolute left-0 right-0 top-0 z-30 flex items-center justify-between gap-2 px-3 pt-2 md:hidden">
-        <p className="pointer-events-none text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">
-          {t("brand")}
-        </p>
+        <div className="pointer-events-none min-w-0">
+          <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">
+            {t("brand")}
+          </p>
+          {compareMode && (
+            <p className="mt-0.5 truncate text-[10px] text-white/30">
+              {t("brandSubCompare")}
+            </p>
+          )}
+        </div>
         <div className="pointer-events-auto flex items-center gap-1.5">
           <LanguageToggle compact />
-          <SearchBar compact />
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            className="x-btn h-8 w-8"
-            aria-label={t("openMenu")}
-          >
-            <MenuIcon />
-          </button>
+          {!compareMode && (
+            <>
+              <SearchBar compact />
+              <button
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                className="x-btn h-8 w-8"
+                aria-label={t("openMenu")}
+              >
+                <MenuIcon />
+              </button>
+            </>
+          )}
+          {compareMode && (
+            <button
+              type="button"
+              onClick={() =>
+                useSimulationStore.getState().setCompareMode(false)
+              }
+              className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
+            >
+              {t("close")}
+            </button>
+          )}
         </div>
       </header>
 
@@ -98,7 +120,7 @@ export function HUD() {
           {cameraMode === "fly" && (
             <div className="pointer-events-none rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-[11px] text-white/50 backdrop-blur-md">
               <span className="font-medium text-white/70">{t("flyMode")}:</span>{" "}
-              WASD · Q/E · Shift
+              {t("flyModeKeys")}
             </div>
           )}
         </div>

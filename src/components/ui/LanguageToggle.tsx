@@ -1,6 +1,7 @@
 "use client";
 
-import { useLocaleStore } from "@/store/useLocaleStore";
+import { useEffect } from "react";
+import { useLocaleStore, useT } from "@/store/useLocaleStore";
 import type { Locale } from "@/i18n/types";
 
 /** Compact ID | EN language switch */
@@ -11,6 +12,11 @@ export function LanguageToggle({
 }) {
   const locale = useLocaleStore((s) => s.locale);
   const setLocale = useLocaleStore((s) => s.setLocale);
+  const t = useT();
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const set = (next: Locale) => {
     if (next !== locale) setLocale(next);
@@ -22,7 +28,7 @@ export function LanguageToggle({
         compact ? "" : ""
       }`}
       role="group"
-      aria-label="Language"
+      aria-label={t("lang")}
     >
       <button
         type="button"

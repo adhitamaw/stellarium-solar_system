@@ -7,18 +7,8 @@ import {
   SPEED_PRESETS,
   useSimulationStore,
 } from "@/store/useSimulationStore";
-import { useT } from "@/store/useLocaleStore";
-
-function formatSimDate(simDays: number): string {
-  const epoch = new Date(Date.UTC(2000, 0, 1, 12));
-  const d = new Date(epoch.getTime() + simDays * 86_400_000);
-  return d.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
+import { useLocaleStore, useT } from "@/store/useLocaleStore";
+import { formatSimDate } from "@/i18n/format";
 
 export function TimeControls() {
   const simDays = useSimulationStore((s) => s.simDaysUi);
@@ -27,6 +17,7 @@ export function TimeControls() {
   const togglePlay = useSimulationStore((s) => s.togglePlay);
   const setSpeed = useSimulationStore((s) => s.setSpeed);
   const setSimDays = useSimulationStore((s) => s.setSimDays);
+  const locale = useLocaleStore((s) => s.locale);
   const t = useT();
 
   useEffect(() => {
@@ -79,7 +70,7 @@ export function TimeControls() {
         <div className="min-w-[6.5rem]">
           <p className="x-label">{t("epoch")}</p>
           <p className="mt-0.5 font-mono text-[13px] tabular-nums tracking-tight text-white">
-            {formatSimDate(simDays)}
+            {formatSimDate(simDays, locale)}
           </p>
         </div>
 

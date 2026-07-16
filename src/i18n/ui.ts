@@ -2,10 +2,8 @@ import type { Locale } from "./types";
 
 const id = {
   brand: "Stellarium",
-  brandSub: "Solar system",
-  brandSubCompare: "Compare",
-  brandSubId: "Simulator Tata Surya Interaktif",
-  brandSubCompareId: "Mode banding ukuran",
+  brandSub: "Simulator Tata Surya Interaktif",
+  brandSubCompare: "Mode banding ukuran",
 
   // Common
   close: "Tutup",
@@ -53,8 +51,9 @@ const id = {
   fact: "Fakta",
   parent: "Induk",
 
-  // Spec labels
+  // Spec labels & units
   radius: "Radius",
+  diameter: "Diameter",
   orbitDistance: "Jarak orbit",
   orbitalPeriod: "Periode orbit",
   rotation: "Rotasi",
@@ -63,7 +62,16 @@ const id = {
   days: "hari",
   years: "thn",
   hours: "jam",
-  thousandKm: "rb km",
+  unitKm: "km",
+  unitAu: "AU",
+  /** e.g. "696,3 ribu km" */
+  thousandKm: "ribu km",
+  /** Short: moon distance "384 rb km dari Bumi" */
+  thousandKmShort: "rb km",
+  radiusAbbrev: "R",
+  diameterApprox: "Ø ≈",
+  retrograde: "mundur",
+  vs: "vs",
 
   // Body types
   typeStar: "Bintang",
@@ -100,6 +108,8 @@ const id = {
   objectB: "Objek B",
   largerApprox: "lebih besar ≈",
   radiusUnit: "radius",
+  radiusRatio: "Rasio radius",
+  scientificScaleNote: "skala ilmiah (bukan orbit visual)",
 
   // Mobile hints
   controlTitle: "Kontrol",
@@ -115,6 +125,7 @@ const id = {
   shortcutsTitle: "Pintasan keyboard",
   lang: "Bahasa",
   flyMode: "Mode terbang",
+  flyModeKeys: "WASD · Q/E · Shift",
   openMenu: "Buka menu",
   scSearch: "Cari objek",
   scAudio: "Toggle suara ambient",
@@ -136,10 +147,8 @@ type UiKeys = keyof typeof id;
 
 const en: Record<UiKeys, string> = {
   brand: "Stellarium",
-  brandSub: "Solar system",
-  brandSubCompare: "Compare",
-  brandSubId: "Interactive Solar System Simulator",
-  brandSubCompareId: "Size compare mode",
+  brandSub: "Interactive Solar System Simulator",
+  brandSubCompare: "Size compare mode",
 
   close: "Close",
   hide: "Hide",
@@ -187,6 +196,7 @@ const en: Record<UiKeys, string> = {
   parent: "Parent",
 
   radius: "Radius",
+  diameter: "Diameter",
   orbitDistance: "Orbital distance",
   orbitalPeriod: "Orbital period",
   rotation: "Rotation",
@@ -195,7 +205,14 @@ const en: Record<UiKeys, string> = {
   days: "days",
   years: "yr",
   hours: "h",
-  thousandKm: "k km",
+  unitKm: "km",
+  unitAu: "AU",
+  thousandKm: "thousand km",
+  thousandKmShort: "k km",
+  radiusAbbrev: "R",
+  diameterApprox: "Ø ≈",
+  retrograde: "ret.",
+  vs: "vs",
 
   typeStar: "Star",
   typePlanet: "Planet",
@@ -228,6 +245,8 @@ const en: Record<UiKeys, string> = {
   objectB: "Object B",
   largerApprox: "larger ≈",
   radiusUnit: "radius",
+  radiusRatio: "Radius ratio",
+  scientificScaleNote: "scientific scale (not visual orbit)",
 
   controlTitle: "Controls",
   controlBody: "1-finger orbit · 2-finger zoom · bottom = nav · ☰ = menu",
@@ -240,6 +259,7 @@ const en: Record<UiKeys, string> = {
   shortcutsTitle: "Keyboard shortcuts",
   lang: "Language",
   flyMode: "Fly mode",
+  flyModeKeys: "WASD · Q/E · Shift",
   openMenu: "Open menu",
   scSearch: "Search objects",
   scAudio: "Toggle ambient audio",

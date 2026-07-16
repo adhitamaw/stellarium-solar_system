@@ -1,21 +1,14 @@
 "use client";
 
-import {
-  bodyById,
-  formatDistance,
-  formatRadius,
-  type CelestialBody,
-} from "@/data/celestialBodies";
+import { bodyById, type CelestialBody } from "@/data/celestialBodies";
 import { localizeBody, bodyTypeLabel } from "@/i18n/localize";
+import {
+  formatDistance,
+  formatNumber,
+  formatRadius,
+  formatThousandKm,
+} from "@/i18n/format";
 import { useLocaleStore, useT } from "@/store/useLocaleStore";
-
-/** Static fallback labels (prefer bodyTypeLabel + locale) */
-export const typeLabel: Record<string, string> = {
-  star: "Bintang",
-  planet: "Planet",
-  moon: "Bulan",
-  asteroid: "Asteroid",
-};
 
 /** Spec-sheet style body facts — monochrome, technical */
 export function InfoBody({
@@ -30,20 +23,21 @@ export function InfoBody({
   const b = localizeBody(body, locale);
   const parentRaw = body.parentId ? bodyById[body.parentId] : null;
   const parent = parentRaw ? localizeBody(parentRaw, locale) : null;
+  const ret = ` · ${t("retrograde")}`;
 
   const orbitValue =
     body.type === "moon"
-      ? `${(body.orbitRadius / 1000).toFixed(0)} ${t("thousandKm")}`
-      : formatDistance(body.distanceAu);
+      ? formatThousandKm(body.orbitRadius, locale)
+      : formatDistance(body.distanceAu, locale);
 
   const periodValue =
     body.orbitalPeriodDays !== 0
       ? Math.abs(body.orbitalPeriodDays) < 400
-        ? `${Math.abs(body.orbitalPeriodDays).toFixed(1)} ${t("days")}${
-            body.orbitalPeriodDays < 0 ? " · R" : ""
+        ? `${formatNumber(Math.abs(body.orbitalPeriodDays), locale, 1)} ${t("days")}${
+            body.orbitalPeriodDays < 0 ? ret : ""
           }`
-        : `${(Math.abs(body.orbitalPeriodDays) / 365.25).toFixed(1)} ${t("years")}${
-            body.orbitalPeriodDays < 0 ? " · R" : ""
+        : `${formatNumber(Math.abs(body.orbitalPeriodDays) / 365.25, locale, 1)} ${t("years")}${
+            body.orbitalPeriodDays < 0 ? ret : ""
           }`
       : null;
 
@@ -58,15 +52,18 @@ export function InfoBody({
       </p>
 
       <div className="border-t border-white/[0.08]">
-        <SpecRow label={t("radius")} value={formatRadius(body.radiusKm)} />
+        <SpecRow
+          label={t("radius")}
+          value={formatRadius(body.radiusKm, locale)}
+        />
         <SpecRow label={t("orbitDistance")} value={orbitValue} />
         {periodValue && (
           <SpecRow label={t("orbitalPeriod")} value={periodValue} />
         )}
         <SpecRow
           label={t("rotation")}
-          value={`${Math.abs(body.rotationPeriodHours).toFixed(1)} ${t("hours")}${
-            body.rotationPeriodHours < 0 ? " · R" : ""
+          value={`${formatNumber(Math.abs(body.rotationPeriodHours), locale, 1)} ${t("hours")}${
+            body.rotationPeriodHours < 0 ? ret : ""
           }`}
         />
         <SpecRow label={t("axialTilt")} value={`${body.axialTiltDeg}°`} />

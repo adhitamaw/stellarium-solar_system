@@ -69,7 +69,7 @@ export const guidedTour: TourStep[] = [
     targetId: "jupiter",
     title: "Jupiter — Raja Planet",
     narration:
-      "Raksasa gas terbesar, dengan badai abadi dan sistem bulan Galilean yang kaya.",
+      "Raksasa gas terbesar, dengan badai abadi dan sistem bulan Galilea yang kaya.",
     durationSec: 11,
   },
   {

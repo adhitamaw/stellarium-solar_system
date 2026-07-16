@@ -12,6 +12,7 @@ import { simClock } from "@/lib/simClock";
 import { InfoBody } from "./InfoContent";
 import { useLocaleStore, useT } from "@/store/useLocaleStore";
 import { localizeBody, bodyTypeLabel } from "@/i18n/localize";
+import { formatSimDate } from "@/i18n/format";
 
 const SPEEDS = SPEED_PRESETS.filter((p) =>
   [1, 5_000, 10_000, 100_000, 1_000_000].includes(p.value),
@@ -52,7 +53,7 @@ export function MobileDock() {
   const total = guidedTour.length;
   const atStart = tourStepIndex <= 0;
   const atEnd = tourStepIndex >= total - 1;
-  const date = formatSimDate(simDays);
+  const date = formatSimDate(simDays, locale);
   const selectedRaw = selectedId ? bodyById[selectedId] : null;
   const selectedBody = selectedRaw
     ? localizeBody(selectedRaw, locale)
@@ -261,13 +262,4 @@ function PauseIcon() {
   );
 }
 
-function formatSimDate(simDays: number): string {
-  const epoch = new Date(Date.UTC(2000, 0, 1, 12));
-  const d = new Date(epoch.getTime() + simDays * 86_400_000);
-  return d.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
+
