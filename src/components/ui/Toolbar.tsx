@@ -18,11 +18,12 @@ export function Toolbar() {
   const quality = useSimulationStore((s) => s.quality);
   const setQuality = useSimulationStore((s) => s.setQuality);
   const fps = useSimulationStore((s) => s.fps);
+  const autoQuality = useSimulationStore((s) => s.autoQuality);
   const t = useT();
 
   return (
-    <div className="pointer-events-auto flex w-full flex-col gap-1">
-      <div className="chip-scroll flex max-w-full items-center gap-1 rounded-xl border border-white/10 bg-slate-950/80 p-1 shadow-xl backdrop-blur-xl sm:flex-wrap sm:gap-1.5 sm:rounded-2xl sm:p-1.5">
+    <div className="pointer-events-auto flex w-full flex-col gap-1.5">
+      <div className="x-panel chip-scroll flex max-w-full items-center gap-1 p-1 sm:flex-wrap sm:gap-1.5 sm:p-1.5">
         <ToggleGroup
           label={t("camera")}
           options={[
@@ -55,10 +56,8 @@ export function Toolbar() {
         </Chip>
       </div>
 
-      <div className="hidden flex-wrap items-center gap-1.5 rounded-2xl border border-white/10 bg-slate-950/70 p-1.5 shadow-xl backdrop-blur-xl sm:flex">
-        <span className="px-1 text-[9px] font-medium uppercase tracking-wider text-white/40">
-          {t("quality")}
-        </span>
+      <div className="x-panel hidden flex-wrap items-center gap-1.5 p-1.5 sm:flex">
+        <span className="x-label px-1">{t("quality")}</span>
         <ToggleGroup
           label={t("quality")}
           options={[
@@ -70,9 +69,14 @@ export function Toolbar() {
           onChange={(v) => setQuality(v as QualityPreset)}
         />
         <div className="mx-0.5 h-6 w-px bg-white/10" />
-        <span className="min-w-[3.5rem] px-1.5 font-mono text-[11px] tabular-nums text-emerald-300/90">
+        <span className="min-w-[3.5rem] px-1.5 font-mono text-[11px] tabular-nums text-white/70">
           {fps > 0 ? `${fps} FPS` : "— FPS"}
         </span>
+        {autoQuality && (
+          <span className="x-chip is-active !py-0.5 text-[9px] uppercase tracking-[0.1em]">
+            {t("autoQ")}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -100,11 +104,7 @@ function ToggleGroup({
           key={o.id}
           type="button"
           onClick={() => onChange(o.id)}
-          className={`rounded-lg px-2 py-1 text-[11px] font-medium transition sm:px-2.5 sm:py-1.5 sm:text-xs ${
-            value === o.id
-              ? "bg-white/15 text-white"
-              : "text-white/45 hover:bg-white/5 hover:text-white/80"
-          }`}
+          className={`x-chip ${value === o.id ? "is-active" : ""}`}
         >
           {o.label}
         </button>
@@ -126,11 +126,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium transition sm:px-2.5 sm:py-1.5 sm:text-xs ${
-        active
-          ? "bg-sky-500/25 text-sky-100 ring-1 ring-sky-400/30"
-          : "text-white/45 hover:bg-white/5 hover:text-white/80"
-      }`}
+      className={`x-chip shrink-0 ${active ? "is-active" : ""}`}
     >
       {children}
     </button>

@@ -118,9 +118,9 @@ export function HUD() {
           <DistanceChip />
           <TourPanel />
           {cameraMode === "fly" && (
-            <div className="pointer-events-none rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-[11px] text-white/50 backdrop-blur-md">
-              <span className="font-medium text-white/70">{t("flyMode")}:</span>{" "}
-              {t("flyModeKeys")}
+            <div className="x-panel pointer-events-none px-3 py-2 text-[11px] text-white/50">
+              <span className="font-medium text-white/75">{t("flyMode")}:</span>{" "}
+              <span className="font-mono text-white/45">{t("flyModeKeys")}</span>
             </div>
           )}
         </div>

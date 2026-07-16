@@ -551,10 +551,10 @@ export function BodyMesh({ body }: BodyMeshProps) {
           zIndexRange={[0, 0]}
         >
           <div
-            className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wide backdrop-blur-sm ${
+            className={`whitespace-nowrap border px-2 py-0.5 text-[10px] font-medium tracking-wide backdrop-blur-sm ${
               selected
-                ? "bg-sky-400/30 text-sky-100 ring-1 ring-sky-300/50"
-                : "bg-black/40 text-white/70"
+                ? "border-white/40 bg-white text-black"
+                : "border-white/15 bg-black/70 text-white/75"
             }`}
           >
             {displayName}

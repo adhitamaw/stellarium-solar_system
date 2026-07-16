@@ -6,7 +6,7 @@ import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLocaleStore, useT } from "@/store/useLocaleStore";
 import { localizeBody, localizeTourStep } from "@/i18n/localize";
 
-/** Desktop navigator — monochrome control strip */
+/** Desktop navigator — monochrome control strip + tour narration */
 export function TourPanel() {
   const tourStepIndex = useSimulationStore((s) => s.tourStepIndex);
   const tourAuto = useSimulationStore((s) => s.tourAuto);
@@ -26,7 +26,7 @@ export function TourPanel() {
   const atEnd = tourStepIndex >= total - 1;
 
   return (
-    <div className="x-panel pointer-events-auto w-full max-w-[300px] p-2">
+    <div className="x-panel pointer-events-auto w-full max-w-[320px] p-2">
       <div className="mb-2 flex items-center justify-between px-1">
         <p className="x-label">{t("navigate")}</p>
         <button
@@ -73,6 +73,19 @@ export function TourPanel() {
           <Chevron dir="right" />
         </button>
       </div>
+
+      {step?.narration && (
+        <div className="mt-2 border border-white/[0.08] bg-black/30 px-2.5 py-2">
+          {step.title && (
+            <p className="mb-1 truncate text-[11px] font-medium text-white/80">
+              {step.title}
+            </p>
+          )}
+          <p className="text-[11px] leading-relaxed text-white/45">
+            {step.narration}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,7 +11,7 @@ import {
 import { simClock } from "@/lib/simClock";
 import { InfoBody } from "./InfoContent";
 import { useLocaleStore, useT } from "@/store/useLocaleStore";
-import { localizeBody, bodyTypeLabel } from "@/i18n/localize";
+import { localizeBody, bodyTypeLabel, localizeTourStep } from "@/i18n/localize";
 import { formatSimDate } from "@/i18n/format";
 
 const SPEEDS = SPEED_PRESETS.filter((p) =>
@@ -46,10 +46,11 @@ export function MobileDock() {
     }
   }, [setSpeed]);
 
-  const step = guidedTour[tourStepIndex] ?? guidedTour[0];
+  const rawStep = guidedTour[tourStepIndex] ?? guidedTour[0];
+  const step = rawStep ? localizeTourStep(rawStep, locale) : null;
   const navBodyRaw = step ? bodyById[step.targetId] : null;
   const navBody = navBodyRaw ? localizeBody(navBodyRaw, locale) : null;
-  const name = navBody?.name ?? "—";
+  const name = navBody?.name ?? step?.title ?? "—";
   const total = guidedTour.length;
   const atStart = tourStepIndex <= 0;
   const atEnd = tourStepIndex >= total - 1;
@@ -61,6 +62,8 @@ export function MobileDock() {
   const parentRaw =
     selectedRaw?.parentId ? bodyById[selectedRaw.parentId] : null;
   const parent = parentRaw ? localizeBody(parentRaw, locale) : null;
+  const showNarration =
+    Boolean(step?.narration) && !(selectedBody && showInfoPanel);
 
   return (
     <div
@@ -68,6 +71,19 @@ export function MobileDock() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="pointer-events-auto mx-2 mb-2 flex min-h-0 max-h-[min(92dvh,100%)] flex-col gap-1.5">
+        {showNarration && step && (
+          <div className="x-panel px-3 py-2">
+            {step.title && (
+              <p className="truncate text-[11px] font-medium text-white/85">
+                {step.title}
+              </p>
+            )}
+            <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-white/45">
+              {step.narration}
+            </p>
+          </div>
+        )}
+
         {selectedBody && selectedRaw && showInfoPanel && (
           <aside
             className="x-panel flex min-h-0 max-h-[min(52dvh,420px)] flex-col overflow-hidden"

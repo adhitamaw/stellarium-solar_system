@@ -12,26 +12,24 @@ export function WebGLFallback({ error }: { error?: string }) {
   }, []);
 
   return (
-    <div className="absolute inset-0 z-[90] flex items-center justify-center bg-[#02040a] p-6 text-center">
-      <div className="max-w-md">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-300/70">
-          {t("onboardingKicker")}
-        </p>
-        <h1 className="mt-2 text-xl font-semibold text-white">
+    <div className="absolute inset-0 z-[90] flex items-center justify-center bg-black p-6 text-center">
+      <div className="x-panel max-w-md p-6">
+        <p className="x-label">{t("onboardingKicker")}</p>
+        <h1 className="mt-2 text-xl font-medium tracking-tight text-white">
           {t("webglTitle")}
         </h1>
-        <p className="mt-3 text-sm leading-relaxed text-white/55">
+        <p className="mt-3 text-sm leading-relaxed text-white/50">
           {t("webglBody")}
         </p>
         {error && (
-          <p className="mt-3 rounded-lg bg-red-500/10 px-3 py-2 font-mono text-[11px] text-red-200/80">
+          <p className="mt-3 border border-white/10 bg-black px-3 py-2 font-mono text-[11px] text-white/45">
             {error}
           </p>
         )}
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="mt-6 rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-semibold text-slate-950"
+          className="x-btn x-btn-primary mt-6 h-10 px-5 text-[11px] uppercase tracking-[0.12em]"
         >
           {t("reload")}
         </button>

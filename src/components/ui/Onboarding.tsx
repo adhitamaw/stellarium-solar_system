@@ -23,34 +23,34 @@ export function Onboarding() {
 
   return (
     <div
-      className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-3 backdrop-blur-sm sm:p-4"
+      className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-4"
       style={{
         paddingTop: "max(0.75rem, env(safe-area-inset-top))",
         paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
       }}
     >
-      <div className="max-h-[min(90dvh,640px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/95 to-slate-950/95 p-4 shadow-2xl sm:rounded-3xl sm:p-8">
+      <div className="x-panel panel-scroll max-h-[min(90dvh,640px)] w-full max-w-lg overflow-y-auto p-4 sm:p-7">
         <div className="mb-3 flex items-start justify-between gap-2">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-300/80">
-            {t("onboardingKicker")}
-          </div>
+          <p className="x-label">{t("onboardingKicker")}</p>
           <LanguageToggle />
         </div>
-        <h1 className="text-xl font-semibold tracking-tight text-white sm:text-3xl">
+        <h1 className="text-xl font-medium tracking-tight text-white sm:text-2xl">
           {t("onboardingTitle")}
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-white/60">
+        <p className="mt-2 text-sm leading-relaxed text-white/50">
           {t("onboardingBody")}
         </p>
 
-        <ul className="mt-6 space-y-3">
+        <ul className="mt-6 space-y-2">
           {tips.map((tip) => (
             <li
               key={tip.title}
-              className="rounded-xl border border-white/8 bg-white/5 px-4 py-3"
+              className="border border-white/[0.08] bg-black/40 px-3.5 py-3"
             >
-              <p className="text-sm font-medium text-white">{tip.title}</p>
-              <p className="mt-0.5 text-sm text-white/55">{tip.body}</p>
+              <p className="text-[13px] font-medium text-white">{tip.title}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-white/45">
+                {tip.body}
+              </p>
             </li>
           ))}
         </ul>
@@ -66,14 +66,14 @@ export function Onboarding() {
               goToTourStep(0);
               setTourAuto(true);
             }}
-            className="flex-1 rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+            className="x-btn x-btn-primary h-11 flex-1 text-[12px] uppercase tracking-[0.12em]"
           >
             {t("startAutoAudio")}
           </button>
           <button
             type="button"
             onClick={() => setShow(false)}
-            className="flex-1 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10"
+            className="x-btn h-11 flex-1 text-[12px] uppercase tracking-[0.12em]"
           >
             {t("exploreFree")}
           </button>

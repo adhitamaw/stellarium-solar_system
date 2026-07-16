@@ -32,7 +32,7 @@ export function LoadingScreen() {
 
   return (
     <div
-      className={`absolute inset-0 z-[100] flex flex-col items-center justify-center bg-[#02040a] transition-opacity duration-500 ${
+      className={`absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-500 ${
         fadeOut
           ? "pointer-events-none opacity-0"
           : "pointer-events-auto opacity-100"
@@ -40,7 +40,7 @@ export function LoadingScreen() {
       aria-busy={!ready}
       aria-live="polite"
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-40">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-35">
         {Array.from({ length: 40 }).map((_, i) => (
           <span
             key={i}
@@ -55,22 +55,22 @@ export function LoadingScreen() {
       </div>
 
       <div className="relative z-10 flex w-[min(90vw,360px)] flex-col items-center px-6 text-center">
-        <div className="mb-6 h-16 w-16 animate-pulse rounded-full bg-gradient-to-br from-amber-200 via-orange-400 to-orange-600 shadow-[0_0_60px_rgba(251,146,60,0.55)]" />
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-300/80">
-          {t("onboardingKicker")}
-        </p>
-        <h1 className="mt-2 text-xl font-semibold tracking-tight text-white sm:text-2xl">
+        <div className="mb-6 h-14 w-14 border border-white/20 bg-white/[0.04]">
+          <div className="h-full w-full animate-pulse bg-white/10" />
+        </div>
+        <p className="x-label">{t("onboardingKicker")}</p>
+        <h1 className="mt-2 text-xl font-medium tracking-tight text-white sm:text-2xl">
           {t("entering")}
         </h1>
-        <p className="mt-2 text-sm text-white/45">{label || t("loadingLabel")}</p>
+        <p className="mt-2 text-sm text-white/40">{label || t("loadingLabel")}</p>
 
-        <div className="mt-8 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-8 h-px w-full overflow-hidden bg-white/10">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-sky-400 via-violet-400 to-amber-300 transition-[width] duration-300 ease-out"
+            className="h-full bg-white transition-[width] duration-300 ease-out"
             style={{ width: `${Math.max(4, progress)}%` }}
           />
         </div>
-        <p className="mt-2 font-mono text-xs tabular-nums text-white/40">
+        <p className="mt-2 font-mono text-xs tabular-nums tracking-wider text-white/35">
           {Math.round(progress)}%
         </p>
 
@@ -78,7 +78,7 @@ export function LoadingScreen() {
           <button
             type="button"
             onClick={() => useLoadingStore.getState().markReady()}
-            className="mt-6 rounded-xl border border-white/15 px-4 py-2 text-sm text-white/70 transition hover:bg-white/10"
+            className="x-btn mt-6 h-9 px-4 text-[11px] uppercase tracking-[0.12em]"
           >
             {t("skipOpen")}
           </button>

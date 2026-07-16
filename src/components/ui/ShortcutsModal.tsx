@@ -23,16 +23,16 @@ export function ShortcutsModal() {
   ];
 
   return (
-    <div className="pointer-events-auto absolute inset-0 z-40 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-950/95 p-5 shadow-2xl">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-white">
+    <div className="pointer-events-auto absolute inset-0 z-40 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="x-panel w-full max-w-sm p-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-[13px] font-medium tracking-wide text-white">
             {t("shortcutsTitle")}
           </h2>
           <button
             type="button"
             onClick={() => setShow(false)}
-            className="text-xs text-white/45 hover:text-white"
+            className="x-btn h-8 px-3 text-[10px] uppercase tracking-[0.12em]"
           >
             {t("close")}
           </button>
@@ -41,12 +41,12 @@ export function ShortcutsModal() {
           {rows.map(([k, v]) => (
             <li
               key={k}
-              className="flex items-center justify-between gap-3 text-sm"
+              className="flex items-center justify-between gap-3 border-b border-white/[0.06] py-2 last:border-0"
             >
-              <kbd className="rounded border border-white/15 bg-white/5 px-2 py-0.5 font-mono text-[11px] text-sky-200">
+              <kbd className="border border-white/15 bg-white/[0.04] px-2 py-0.5 font-mono text-[11px] text-white/80">
                 {k}
               </kbd>
-              <span className="text-white/60">{v}</span>
+              <span className="text-right text-[12px] text-white/50">{v}</span>
             </li>
           ))}
         </ul>

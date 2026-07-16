@@ -44,14 +44,14 @@ export function DistanceChip() {
   }
 
   return (
-    <div className="pointer-events-none rounded-xl border border-white/10 bg-slate-950/65 px-3 py-2 text-[11px] text-white/70 shadow-lg backdrop-blur-md">
+    <div className="x-panel pointer-events-none px-3 py-2 text-[11px] text-white/60">
       <span className="font-medium text-white">{b.name}</span>
-      <span className="mx-1.5 text-white/25">·</span>
-      <span>
+      <span className="mx-1.5 text-white/20">·</span>
+      <span className="font-mono tabular-nums">
         {t("radiusAbbrev")} {formatRadius(raw.radiusKm, locale)}
       </span>
-      <span className="mx-1.5 text-white/25">·</span>
-      <span>{distLabel}</span>
+      <span className="mx-1.5 text-white/20">·</span>
+      <span className="font-mono tabular-nums text-white/50">{distLabel}</span>
     </div>
   );
 }
