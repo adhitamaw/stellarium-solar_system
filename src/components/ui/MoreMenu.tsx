@@ -29,6 +29,9 @@ export function MoreMenu({
   const audioEnabled = useSimulationStore((s) => s.audioEnabled);
   const audioVolume = useSimulationStore((s) => s.audioVolume);
   const setAudioEnabled = useSimulationStore((s) => s.setAudioEnabled);
+  const setAudioVolume = useSimulationStore((s) => s.setAudioVolume);
+  const autoQuality = useSimulationStore((s) => s.autoQuality);
+  const setAutoQuality = useSimulationStore((s) => s.setAutoQuality);
   const toggleCompareMode = useSimulationStore((s) => s.toggleCompareMode);
   const requestCapture = useSimulationStore((s) => s.requestCapture);
   const selectedId = useSimulationStore((s) => s.selectedId);
@@ -117,16 +120,56 @@ export function MoreMenu({
             value={quality}
             onChange={(v) => setQuality(v as QualityPreset)}
           />
-          <p className="mt-2 font-mono text-[11px] tabular-nums text-white/30">
-            {fps > 0 ? `${fps} FPS` : "— FPS"}
-          </p>
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <p className="font-mono text-[11px] tabular-nums text-white/30">
+              {fps > 0 ? `${fps} FPS` : "— FPS"}
+            </p>
+            <button
+              type="button"
+              onClick={() => setAutoQuality(!autoQuality)}
+              className={`x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em] ${
+                autoQuality ? "x-btn-primary" : ""
+              }`}
+            >
+              {autoQuality ? t("autoQ") : t("manualQ")}
+            </button>
+          </div>
+        </Section>
+
+        <Section title={t("audio")}>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => void onAudio()}
+              className={`x-btn h-10 w-full text-[11px] uppercase tracking-[0.1em] ${
+                audioEnabled ? "x-btn-primary" : ""
+              }`}
+            >
+              {audioEnabled ? t("audioOn") : t("audioOff")}
+            </button>
+            {audioEnabled && (
+              <label className="flex items-center gap-3 px-0.5">
+                <span className="x-label shrink-0">{t("volume")}</span>
+                <input
+                  type="range"
+                  min={0.05}
+                  max={1}
+                  step={0.05}
+                  value={audioVolume}
+                  onChange={(e) => setAudioVolume(Number(e.target.value))}
+                  className="x-range min-w-0 flex-1"
+                  aria-label={t("volume")}
+                />
+                <span className="w-8 font-mono text-[11px] tabular-nums text-white/40">
+                  {Math.round(audioVolume * 100)}
+                </span>
+              </label>
+            )}
+          </div>
         </Section>
 
         <Section title={t("actions")}>
           <div className="grid grid-cols-2 gap-2">
-            <Action onClick={() => void onAudio()}>
-              {audioEnabled ? t("audioOn") : t("audioOff")}
-            </Action>
             <Action
               onClick={async () => {
                 await copyFocusLink(selectedId ?? "earth");

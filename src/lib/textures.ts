@@ -22,6 +22,18 @@ function configure(
   return tex;
 }
 
+/** Prefer 2K asset when quality is low or 8K path would OOM on mobile */
+export function resolveTextureUrl(
+  url: string | undefined,
+  lowResOnly: boolean,
+): string | undefined {
+  if (!url) return undefined;
+  if (!lowResOnly) return url;
+  if (url.includes("8k_")) return url.replace("8k_", "2k_");
+  if (url.includes("4k_")) return url.replace("4k_", "2k_");
+  return url;
+}
+
 /** Load texture with cache; resolves null if missing/failed */
 export function loadTexture(
   url: string | undefined,

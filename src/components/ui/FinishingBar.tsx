@@ -10,6 +10,7 @@ export function FinishingBar() {
   const audioEnabled = useSimulationStore((s) => s.audioEnabled);
   const audioVolume = useSimulationStore((s) => s.audioVolume);
   const setAudioEnabled = useSimulationStore((s) => s.setAudioEnabled);
+  const setAudioVolume = useSimulationStore((s) => s.setAudioVolume);
   const compareMode = useSimulationStore((s) => s.compareMode);
   const toggleCompareMode = useSimulationStore((s) => s.toggleCompareMode);
   const requestCapture = useSimulationStore((s) => s.requestCapture);
@@ -51,6 +52,22 @@ export function FinishingBar() {
         >
           {audioEnabled ? t("audioOn") : t("audio")}
         </button>
+
+        {audioEnabled && (
+          <label className="flex h-8 items-center gap-1.5 px-1" title={t("volume")}>
+            <span className="sr-only">{t("volume")}</span>
+            <input
+              type="range"
+              min={0.05}
+              max={1}
+              step={0.05}
+              value={audioVolume}
+              onChange={(e) => setAudioVolume(Number(e.target.value))}
+              className="x-range w-16 sm:w-20"
+              aria-label={t("volume")}
+            />
+          </label>
+        )}
 
         <button
           type="button"

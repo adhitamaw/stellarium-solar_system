@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { guidedTour } from "@/data/tours";
+import { isMobileDevice } from "@/lib/device";
 import { simClock, type ScaleMode as ClockScale } from "@/lib/simClock";
 
 export type CameraMode = "orbit" | "fly";
@@ -223,6 +224,9 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     const { autoQuality, qualityLocked, quality } = get();
     if (!autoQuality || qualityLocked) return;
 
+    // Mobile: never auto-upgrade past balanced (8K textures thrash memory)
+    const maxIdx = isMobileDevice() ? 1 : QUALITY_ORDER.length - 1;
+
     if (fps > 0 && fps < 40) {
       lowFpsAccum += 0.5;
       highFpsAccum = 0;
@@ -239,7 +243,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       if (highFpsAccum >= 4) {
         highFpsAccum = 0;
         const idx = QUALITY_ORDER.indexOf(quality);
-        if (idx >= 0 && idx < QUALITY_ORDER.length - 1) {
+        if (idx >= 0 && idx < maxIdx) {
           set({ quality: QUALITY_ORDER[idx + 1] });
         }
       }

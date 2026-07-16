@@ -57,8 +57,9 @@ export const bodyTextures: Record<string, BodyTextureSet> = {
     map: `${T}/8k_earth_daymap.jpg`,
     mapPreview: `${T}/2k_earth_daymap.jpg`,
     clouds: `${T}/8k_earth_clouds.jpg`,
+    /** Prefer 2K clouds on performance via replace; file exists */
     night: `${T}/8k_earth_nightmap.jpg`,
-    normal: `${T}/4k_earth_normal_map.png`,
+    normal: `${T}/2k_earth_normal_map.png`,
     specular: `${T}/2k_earth_specular_map.png`,
     color: "#ffffff",
     // Real Earth limb: thin pale blue, not neon ring

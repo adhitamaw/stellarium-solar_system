@@ -33,6 +33,7 @@ const id = {
   audio: "Suara",
   audioOn: "Suara ON",
   audioOff: "Suara OFF",
+  volume: "Volume",
   linkCopied: "Tautan disalin!",
   linkFailed: "Gagal menyalin",
   quality: "Kualitas",
@@ -100,6 +101,7 @@ const id = {
   entering: "Memasuki tata surya",
   skipOpen: "Lewati / buka sekarang",
   loadingLabel: "Menyiapkan…",
+  loadingBody: "Memuat {name}…",
 
   // Compare
   compareMode: "Mode banding ukuran",
@@ -177,6 +179,7 @@ const en: Record<UiKeys, string> = {
   audio: "Audio",
   audioOn: "Audio ON",
   audioOff: "Audio OFF",
+  volume: "Volume",
   linkCopied: "Link copied!",
   linkFailed: "Copy failed",
   quality: "Quality",
@@ -238,6 +241,7 @@ const en: Record<UiKeys, string> = {
   entering: "Entering the solar system",
   skipOpen: "Skip / open now",
   loadingLabel: "Preparing…",
+  loadingBody: "Loading {name}…",
 
   compareMode: "Size compare",
   compareHint: "Scientific radius scale (not orbital distance)",

@@ -13,6 +13,7 @@ import {
   createPlanetGeometry,
   fixRingUVs,
   loadMapProgressive,
+  resolveTextureUrl,
   loadTexture,
 } from "@/lib/textures";
 import {
@@ -27,7 +28,7 @@ import {
 } from "@/shaders/planet";
 import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLoadingStore } from "@/store/useLoadingStore";
-import { useLocaleStore } from "@/store/useLocaleStore";
+import { useLocaleStore, t as translate } from "@/store/useLocaleStore";
 import { localizeBody } from "@/i18n/localize";
 
 interface BodyMeshProps {
@@ -188,24 +189,23 @@ export function BodyMesh({ body }: BodyMeshProps) {
 
   useEffect(() => {
     let alive = true;
-    const maxAniso = Math.min(
-      TEXTURE_ANISO_SAFE,
-      gl.capabilities.getMaxAnisotropy(),
-    );
-    const aniso = (t: THREE.Texture) => {
-      t.anisotropy = maxAniso;
-      return t;
+    const lowResOnly = quality === "performance";
+    const maxAniso = lowResOnly
+      ? 1
+      : Math.min(TEXTURE_ANISO_SAFE, gl.capabilities.getMaxAnisotropy());
+    const aniso = (tex: THREE.Texture) => {
+      tex.anisotropy = maxAniso;
+      return tex;
     };
 
     (async () => {
       const bumpLoad = () => {
-        // Major bodies contribute more to loading bar
         const w =
           body.type === "star" || body.type === "planet" ? 3.2 : 0.6;
-        useLoadingStore.getState().bump(w, `Memuat ${body.name}…`);
+        const name = localizeBody(body, useLocaleStore.getState().locale).name;
+        const label = translate("loadingBody").replace("{name}", name);
+        useLoadingStore.getState().bump(w, label);
       };
-
-      const lowResOnly = quality === "performance";
 
       if (isStar && sunMat) {
         await loadMapProgressive(
@@ -241,14 +241,10 @@ export function BodyMesh({ body }: BodyMeshProps) {
       if (alive) bumpLoad();
 
       if (texSet.night) {
-        // Prefer 2k on performance; 8k only on higher quality
-        let nightUrl = texSet.night;
-        if (lowResOnly && nightUrl.includes("8k_")) {
-          nightUrl = nightUrl.replace("8k_", "2k_");
-        }
+        const nightUrl = resolveTextureUrl(texSet.night, lowResOnly);
         let night = await loadTexture(nightUrl);
-        if (!night && texSet.night.includes("8k_")) {
-          night = await loadTexture(texSet.night.replace("8k_", "2k_"));
+        if (!night && texSet.night !== nightUrl) {
+          night = await loadTexture(texSet.night);
         }
         if (alive && night) {
           aniso(night);
@@ -259,17 +255,13 @@ export function BodyMesh({ body }: BodyMeshProps) {
       }
 
       if (texSet.clouds) {
-        let cloudUrl = texSet.clouds;
-        if (lowResOnly && cloudUrl.includes("8k_")) {
-          cloudUrl = cloudUrl.replace("8k_", "2k_");
-        }
+        const cloudUrl = resolveTextureUrl(texSet.clouds, lowResOnly);
         let clouds = await loadTexture(cloudUrl);
-        if (!clouds && texSet.clouds.includes("8k_")) {
-          clouds = await loadTexture(texSet.clouds.replace("8k_", "2k_"));
+        if (!clouds && texSet.clouds !== cloudUrl) {
+          clouds = await loadTexture(texSet.clouds);
         }
         if (alive && clouds) {
           aniso(clouds);
-          // Separate shell for depth (Earth-like). Keep light composite in shader for lit clouds on night/day.
           if (
             body.id === "earth" ||
             body.id === "venus" ||
@@ -288,7 +280,8 @@ export function BodyMesh({ body }: BodyMeshProps) {
         }
       }
 
-      if (texSet.specular) {
+      // Specular + normal: skip on performance (mobile default)
+      if (texSet.specular && !lowResOnly) {
         const spec = await loadTexture(texSet.specular, { srgb: false });
         if (alive && spec) {
           aniso(spec);
@@ -300,8 +293,9 @@ export function BodyMesh({ body }: BodyMeshProps) {
         }
       }
 
-      if (texSet.normal && quality !== "performance") {
-        let nrm = await loadTexture(texSet.normal, { normal: true });
+      if (texSet.normal && !lowResOnly) {
+        const nrmUrl = resolveTextureUrl(texSet.normal, false);
+        let nrm = await loadTexture(nrmUrl, { normal: true });
         if (!nrm) {
           nrm = await loadTexture("/textures/2k_earth_normal_map.png", {
             normal: true,
@@ -330,7 +324,7 @@ export function BodyMesh({ body }: BodyMeshProps) {
       alive = false;
     };
   }, [
-    body.id,
+    body,
     isStar,
     gl,
     quality,
