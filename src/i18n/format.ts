@@ -24,7 +24,7 @@ export function formatNumber(
 /** Orbital distance: km for very small AU, else AU */
 export function formatDistance(
   au: number | undefined,
-  locale: Locale = "id",
+  locale: Locale = "en",
 ): string {
   const dict = u(locale);
   if (au === undefined || au === 0) return "—";
@@ -35,8 +35,8 @@ export function formatDistance(
   return `${formatNumber(au, locale, 3)} ${dict.unitAu}`;
 }
 
-/** Mean radius display (e.g. "6.371 ribu km" / "6.371 thousand km") */
-export function formatRadius(km: number, locale: Locale = "id"): string {
+/** Mean radius display (e.g. "6.371 thousand km" / "6.371 ribu km") */
+export function formatRadius(km: number, locale: Locale = "en"): string {
   const dict = u(locale);
   if (km >= 1_000) {
     return `${formatNumber(km / 1_000, locale, 1)} ${dict.thousandKm}`;
@@ -45,13 +45,13 @@ export function formatRadius(km: number, locale: Locale = "id"): string {
 }
 
 /** Absolute km with locale grouping, e.g. "6.371 km" */
-export function formatKmExact(km: number, locale: Locale = "id"): string {
+export function formatKmExact(km: number, locale: Locale = "en"): string {
   const dict = u(locale);
   return `${formatNumber(km, locale, km >= 100 ? 0 : 1)} ${dict.unitKm}`;
 }
 
 /** Simulation epoch date (UTC) */
-export function formatSimDate(simDays: number, locale: Locale = "id"): string {
+export function formatSimDate(simDays: number, locale: Locale = "en"): string {
   const epoch = new Date(Date.UTC(2000, 0, 1, 12));
   const d = new Date(epoch.getTime() + simDays * 86_400_000);
   return d.toLocaleDateString(bcp47(locale), {
@@ -62,8 +62,8 @@ export function formatSimDate(simDays: number, locale: Locale = "id"): string {
   });
 }
 
-/** Short distance unit for moon orbits: "384 rb km" / "384 k km" */
-export function formatThousandKm(km: number, locale: Locale = "id"): string {
+/** Short distance unit for moon orbits: "384 k km" / "384 rb km" */
+export function formatThousandKm(km: number, locale: Locale = "en"): string {
   const dict = u(locale);
   return `${formatNumber(km / 1000, locale, 0)} ${dict.thousandKmShort}`;
 }

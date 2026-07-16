@@ -7,14 +7,14 @@ import { uiDict, type UiKey } from "@/i18n/ui";
 const STORAGE_KEY = "stellarium-locale";
 
 function readStored(): Locale {
-  if (typeof window === "undefined") return "id";
+  if (typeof window === "undefined") return "en";
   try {
     const v = localStorage.getItem(STORAGE_KEY);
     if (v === "en" || v === "id") return v;
   } catch {
     /* ignore */
   }
-  return "id";
+  return "en";
 }
 
 interface LocaleState {
@@ -24,7 +24,7 @@ interface LocaleState {
 }
 
 export const useLocaleStore = create<LocaleState>((set, get) => ({
-  locale: "id",
+  locale: "en",
   setLocale: (locale) => {
     try {
       localStorage.setItem(STORAGE_KEY, locale);

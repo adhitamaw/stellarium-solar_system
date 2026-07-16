@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stellarium Cinematic — Simulator Tata Surya",
+  title: "Stellarium Cinematic — Solar System Simulator",
   description:
-    "Simulator tata surya 3D interaktif dan sinematik. Jelajahi planet, bulan, dan orbit dengan visual setara dokumenter luar angkasa.",
+    "Interactive cinematic 3D solar system simulator. Explore planets, moons, and orbits with documentary-grade visuals.",
   keywords: [
     "solar system",
     "tata surya",
@@ -49,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="id"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-dvh overflow-hidden overscroll-none bg-[#02040a] text-white">
