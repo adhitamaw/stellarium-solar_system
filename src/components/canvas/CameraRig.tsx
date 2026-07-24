@@ -73,9 +73,11 @@ export function CameraRig() {
     focusId.current = selectedId;
     const r = visualRadius(body, simClock.scaleMode);
     // Closer cinematic framing (Google Earth-like on approach)
+    const close =
+      body.type === "moon" || body.type === "spacecraft";
     const dist = Math.max(
-      r * (body.type === "star" ? 5.5 : body.type === "moon" ? 4.5 : 3.8),
-      body.type === "star" ? 14 : 2.2,
+      r * (body.type === "star" ? 5.5 : close ? 4.5 : 3.8),
+      body.type === "star" ? 14 : body.type === "spacecraft" ? 1.4 : 2.2,
     );
 
     startCam.current.copy(camera.position);
@@ -104,9 +106,11 @@ export function CameraRig() {
       const body = bodyById[focusId.current!];
       if (pos && body) {
         const r = visualRadius(body, simClock.scaleMode);
+        const close =
+          body.type === "moon" || body.type === "spacecraft";
         const dist = Math.max(
-          r * (body.type === "star" ? 5.5 : body.type === "moon" ? 4.5 : 3.8),
-          body.type === "star" ? 14 : 2.2,
+          r * (body.type === "star" ? 5.5 : close ? 4.5 : 3.8),
+          body.type === "star" ? 14 : body.type === "spacecraft" ? 1.4 : 2.2,
         );
         endTarget.current.set(pos.x, pos.y, pos.z);
         _offset.set(dist * 0.55, dist * 0.28, dist * 0.75);

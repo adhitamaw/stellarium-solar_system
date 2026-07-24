@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { guidedTour } from "@/data/tours";
 import { updateAllBodyPositions } from "@/lib/orbital";
-import { simClock } from "@/lib/simClock";
+import { daysSinceJ2000, simClock } from "@/lib/simClock";
 import { useSimulationStore } from "@/store/useSimulationStore";
 
 const UI_INTERVAL = 1 / 20;
@@ -20,7 +20,12 @@ export function SimulationLoop() {
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05);
 
-    if (simClock.playing) {
+    if (simClock.realtime) {
+      // Lock epoch to wall clock so orbits/rotation match "now"
+      if (simClock.playing) {
+        simClock.days = daysSinceJ2000();
+      }
+    } else if (simClock.playing) {
       simClock.days += (simClock.speed / 86_400) * dt;
     }
 

@@ -41,6 +41,10 @@ export function formatRadius(km: number, locale: Locale = "en"): string {
   if (km >= 1_000) {
     return `${formatNumber(km / 1_000, locale, 1)} ${dict.thousandKm}`;
   }
+  // Spacecraft / tiny bodies: show meters
+  if (km > 0 && km < 1) {
+    return `${formatNumber(km * 1_000, locale, km < 0.01 ? 1 : 0)} m`;
+  }
   return `${formatNumber(km, locale, 1)} ${dict.unitKm}`;
 }
 
@@ -50,16 +54,35 @@ export function formatKmExact(km: number, locale: Locale = "en"): string {
   return `${formatNumber(km, locale, km >= 100 ? 0 : 1)} ${dict.unitKm}`;
 }
 
-/** Simulation epoch date (UTC) */
-export function formatSimDate(simDays: number, locale: Locale = "en"): string {
-  const epoch = new Date(Date.UTC(2000, 0, 1, 12));
-  const d = new Date(epoch.getTime() + simDays * 86_400_000);
-  return d.toLocaleDateString(bcp47(locale), {
+/** Simulation epoch date (UTC). Pass `withTime` for live/realtime display. */
+export function formatSimDate(
+  simDays: number,
+  locale: Locale = "en",
+  opts?: { withTime?: boolean },
+): string {
+  // Keep in sync with J2000_MS in lib/simClock
+  const epoch = Date.UTC(2000, 0, 1, 12, 0, 0);
+  const d = new Date(epoch + simDays * 86_400_000);
+  if (opts?.withTime) {
+    const s = d.toLocaleString(bcp47(locale), {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    });
+    return `${s} UTC`;
+  }
+  const s = d.toLocaleDateString(bcp47(locale), {
     day: "2-digit",
     month: "short",
     year: "numeric",
     timeZone: "UTC",
   });
+  return `${s} UTC`;
 }
 
 /** Short distance unit for moon orbits: "384 k km" / "384 rb km" */

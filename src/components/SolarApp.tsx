@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { HUD } from "@/components/ui/HUD";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { AudioBridge } from "@/components/canvas/AudioBridge";
@@ -26,21 +26,18 @@ const SolarCanvas = dynamic(
 
 export function SolarApp() {
   const { state, msg } = useWebGLSupport();
-  const setQuality = useSimulationStore((s) => s.setQuality);
-  const [bootstrapped, setBootstrapped] = useState(false);
 
-  // Mobile/low-end: default to performance (2K textures, low DPR)
   useEffect(() => {
+    // Client-only: locale, quality, and live wall-clock epoch
     hydrateLocale();
     const q = preferredQuality();
-    setQuality(q, false);
-    // Keep auto quality on mobile so it can drop further if needed
     useSimulationStore.setState({
       quality: q,
       autoQuality: true,
       qualityLocked: false,
     });
-    setBootstrapped(true);
+    // Snap realtime date after hydration (never Date.now() during SSR)
+    useSimulationStore.getState().enableRealtime();
 
     // Global safety: never leave loading forever
     const t = window.setTimeout(() => {
@@ -49,7 +46,7 @@ export function SolarApp() {
       }
     }, 8000);
     return () => clearTimeout(t);
-  }, [setQuality]);
+  }, []);
 
   if (state === "fail") {
     return <WebGLFallback error={msg} />;
@@ -57,7 +54,7 @@ export function SolarApp() {
 
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-[#02040a]">
-      {bootstrapped && state === "ok" && <SolarCanvas />}
+      {state === "ok" && <SolarCanvas />}
       <HUD />
       <AudioBridge />
       <DeepLink />

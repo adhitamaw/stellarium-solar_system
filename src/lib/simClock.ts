@@ -6,21 +6,38 @@
 
 export type ScaleMode = "visible" | "realistic";
 
+/** J2000 epoch used for sim days → calendar (UTC noon, 2000-01-01) */
+export const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
+
+/** Days since J2000 for a wall-clock timestamp (default: now) */
+export function daysSinceJ2000(ms: number = Date.now()): number {
+  return (ms - J2000_MS) / 86_400_000;
+}
+
 interface SimClock {
   /** Days since display epoch (J2000-ish) */
   days: number;
-  /** Multiplier of real-time (1 = real-time) */
+  /** Multiplier of real-time (1 = wall-clock rate when not in realtime lock) */
   speed: number;
   playing: boolean;
   scaleMode: ScaleMode;
+  /**
+   * When true, `days` tracks the actual current date/time (wall clock).
+   * Orbit & rotation then match "now" instead of an arbitrary scrubbed epoch.
+   */
+  realtime: boolean;
 }
 
-/** Keep in sync with DEFAULT_SPEED in useSimulationStore (5k×) */
+/**
+ * Stable SSR defaults — do NOT call Date.now() here (hydration mismatch).
+ * Realtime mode snaps to wall clock on the client (SimulationLoop / enableRealtime).
+ */
 export const simClock: SimClock = {
   days: 0,
-  speed: 5_000,
+  speed: 1,
   playing: true,
-  scaleMode: "visible",
+  scaleMode: "realistic",
+  realtime: true,
 };
 
 /** Reusable world positions — written every frame, read by meshes/camera */

@@ -17,6 +17,7 @@ export function ShortcutsModal() {
     ["C", t("scCapture")],
     ["← / →", t("scNav")],
     ["?", t("scHelp")],
+    ["H", t("scHideUi")],
     ["Esc", t("scEsc")],
     ["Scroll", t("scScroll")],
     ["WASD + Q/E", t("scFly")],

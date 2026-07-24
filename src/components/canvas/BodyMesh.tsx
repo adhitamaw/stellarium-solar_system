@@ -30,6 +30,7 @@ import { useSimulationStore } from "@/store/useSimulationStore";
 import { useLoadingStore } from "@/store/useLoadingStore";
 import { useLocaleStore, t as translate } from "@/store/useLocaleStore";
 import { localizeBody } from "@/i18n/localize";
+import { SpacecraftBody } from "./spacecraft/SpacecraftBody";
 
 interface BodyMeshProps {
   body: CelestialBody;
@@ -43,6 +44,15 @@ const noRaycast = () => {
 };
 
 export function BodyMesh({ body }: BodyMeshProps) {
+  // Craft use dedicated procedural models (ISS / Voyager), not planet spheres
+  if (body.type === "spacecraft") {
+    return <SpacecraftBody body={body} />;
+  }
+
+  return <PlanetBodyMesh body={body} />;
+}
+
+function PlanetBodyMesh({ body }: BodyMeshProps) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const cloudRef = useRef<THREE.Mesh>(null);
@@ -200,8 +210,7 @@ export function BodyMesh({ body }: BodyMeshProps) {
 
     (async () => {
       const bumpLoad = () => {
-        const w =
-          body.type === "star" || body.type === "planet" ? 3.2 : 0.6;
+        const w = body.type === "star" || body.type === "planet" ? 3.2 : 0.6;
         const name = localizeBody(body, useLocaleStore.getState().locale).name;
         const label = translate("loadingBody").replace("{name}", name);
         useLoadingStore.getState().bump(w, label);
@@ -534,7 +543,9 @@ export function BodyMesh({ body }: BodyMeshProps) {
       )}
 
       {showLabels &&
-        (body.type !== "moon" ||
+        (body.type === "planet" ||
+          body.type === "star" ||
+          body.type === "asteroid" ||
           selected ||
           selectedId === body.parentId) && (
         <Html

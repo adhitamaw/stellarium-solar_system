@@ -38,6 +38,8 @@ export function bodyTypeLabel(
       return t("typeMoon", locale);
     case "asteroid":
       return t("typeAsteroid", locale);
+    case "spacecraft":
+      return t("typeSpacecraft", locale);
     default:
       return type;
   }

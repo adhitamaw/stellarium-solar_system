@@ -13,18 +13,25 @@ import { formatSimDate } from "@/i18n/format";
 export function TimeControls() {
   const simDays = useSimulationStore((s) => s.simDaysUi);
   const speed = useSimulationStore((s) => s.speed);
+  const realtime = useSimulationStore((s) => s.realtime);
   const isPlaying = useSimulationStore((s) => s.isPlaying);
   const togglePlay = useSimulationStore((s) => s.togglePlay);
   const setSpeed = useSimulationStore((s) => s.setSpeed);
+  const enableRealtime = useSimulationStore((s) => s.enableRealtime);
   const setSimDays = useSimulationStore((s) => s.setSimDays);
   const locale = useLocaleStore((s) => s.locale);
   const t = useT();
 
   useEffect(() => {
-    const current = useSimulationStore.getState().speed;
-    const known = SPEED_PRESETS.some((p) => p.value === current);
+    const state = useSimulationStore.getState();
+    if (state.realtime) {
+      simClock.realtime = true;
+      simClock.speed = 1;
+      return;
+    }
+    const known = SPEED_PRESETS.some((p) => p.value === state.speed);
     if (!known) setSpeed(DEFAULT_SPEED);
-    else simClock.speed = current;
+    else simClock.speed = state.speed;
   }, [setSpeed]);
 
   const jump = (days: number) => setSimDays(simClock.days + days);
@@ -60,8 +67,9 @@ export function TimeControls() {
           <button
             type="button"
             className="x-btn h-8 w-8"
-            onClick={() => setSimDays(0)}
+            onClick={() => enableRealtime()}
             aria-label={t("reset")}
+            title={t("speedRealtime")}
           >
             <ResetIcon />
           </button>
@@ -69,19 +77,30 @@ export function TimeControls() {
 
         <div className="min-w-[6.5rem]">
           <p className="x-label">{t("epoch")}</p>
-          <p className="mt-0.5 font-mono text-[13px] tabular-nums tracking-tight text-white">
-            {formatSimDate(simDays, locale)}
+          <p
+            className="mt-0.5 font-mono text-[13px] tabular-nums tracking-tight text-white"
+            suppressHydrationWarning
+          >
+            {formatSimDate(simDays, locale, { withTime: realtime })}
           </p>
         </div>
 
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
           <span className="x-label mr-1">{t("speed")}</span>
+          <button
+            type="button"
+            onClick={() => enableRealtime()}
+            className={`x-chip ${realtime ? "is-active" : ""}`}
+            title={t("speedRealtime")}
+          >
+            {t("speedRealtime")}
+          </button>
           {SPEED_PRESETS.map((p) => (
             <button
               key={p.value}
               type="button"
               onClick={() => setSpeed(p.value)}
-              className={`x-chip ${speed === p.value ? "is-active" : ""}`}
+              className={`x-chip ${!realtime && speed === p.value ? "is-active" : ""}`}
             >
               {p.label}
             </button>

@@ -3,7 +3,11 @@
 import { create } from "zustand";
 import { guidedTour } from "@/data/tours";
 import { isMobileDevice } from "@/lib/device";
-import { simClock, type ScaleMode as ClockScale } from "@/lib/simClock";
+import {
+  daysSinceJ2000,
+  simClock,
+  type ScaleMode as ClockScale,
+} from "@/lib/simClock";
 
 export type CameraMode = "orbit" | "fly";
 export type ScaleMode = ClockScale;
@@ -12,6 +16,11 @@ export type QualityPreset = "performance" | "balanced" | "ultra";
 interface SimulationState {
   simDaysUi: number;
   speed: number;
+  /**
+   * When true, simulation date/time follows the real wall clock
+   * (planet positions ≈ "now"). Speed chips besides Realtime turn this off.
+   */
+  realtime: boolean;
   isPlaying: boolean;
 
   selectedId: string | null;
@@ -36,7 +45,10 @@ interface SimulationState {
   autoQuality: boolean;
   qualityLocked: boolean;
   captureRequestId: number;
+  /** Temporary HUD hide during screenshot capture */
   hideHud: boolean;
+  /** User cinema mode — hide all menus until shown again */
+  uiHidden: boolean;
 
   showOnboarding: boolean;
   showInfoPanel: boolean;
@@ -51,6 +63,8 @@ interface SimulationState {
   setSimDaysUi: (days: number) => void;
   setSimDays: (days: number) => void;
   setSpeed: (speed: number) => void;
+  /** Snap to wall-clock time and keep orbits in sync with "now" */
+  enableRealtime: () => void;
   togglePlay: () => void;
   setPlaying: (v: boolean) => void;
   selectBody: (id: string | null) => void;
@@ -63,7 +77,8 @@ interface SimulationState {
   setCameraMode: (mode: CameraMode) => void;
   toggleOrbits: () => void;
   toggleLabels: () => void;
-  setScaleMode: (mode: ScaleMode) => void;
+  /** No-op lock — app always uses real scale */
+  setScaleMode: (mode?: ScaleMode) => void;
   setQuality: (q: QualityPreset, locked?: boolean) => void;
   setFps: (fps: number) => void;
   setAutoQuality: (v: boolean) => void;
@@ -80,6 +95,8 @@ interface SimulationState {
 
   requestCapture: () => void;
   setHideHud: (v: boolean) => void;
+  setUiHidden: (v: boolean) => void;
+  toggleUiHidden: () => void;
 
   setShowOnboarding: (v: boolean) => void;
   setShowInfoPanel: (v: boolean) => void;
@@ -93,18 +110,18 @@ interface SimulationState {
   goToTourStep: (index: number) => void;
 }
 
+/**
+ * Accelerated speed chips only (Realtime is a separate leftmost control).
+ * Four total UI buttons: Realtime | 1k× | 10k× | 100k×
+ */
 export const SPEED_PRESETS = [
-  { label: "1×", value: 1 },
-  { label: "100×", value: 100 },
   { label: "1k×", value: 1_000 },
-  { label: "5k×", value: 5_000 },
   { label: "10k×", value: 10_000 },
   { label: "100k×", value: 100_000 },
-  { label: "1M×", value: 1_000_000 },
 ] as const;
 
-/** Default simulation rate — also the highlighted preset on load */
-export const DEFAULT_SPEED = 5_000;
+/** Default when leaving Realtime without picking another chip */
+export const DEFAULT_SPEED = 1_000;
 
 const QUALITY_ORDER: QualityPreset[] = [
   "performance",
@@ -116,8 +133,10 @@ let lowFpsAccum = 0;
 let highFpsAccum = 0;
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
+  // Stable for SSR; client snaps to wall clock when realtime is on
   simDaysUi: 0,
-  speed: DEFAULT_SPEED,
+  speed: 1,
+  realtime: true,
   isPlaying: true,
 
   selectedId: null,
@@ -125,7 +144,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   cameraMode: "orbit",
   showOrbits: true,
   showLabels: false,
-  scaleMode: "visible",
+  scaleMode: "realistic",
   // Desktop default balanced; SolarApp overrides to performance on mobile
   quality: "balanced",
   fps: 0,
@@ -141,6 +160,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   qualityLocked: false,
   captureRequestId: 0,
   hideHud: false,
+  uiHidden: false,
 
   showOnboarding: true,
   showInfoPanel: true,
@@ -153,13 +173,30 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setSimDaysUi: (days) => set({ simDaysUi: days }),
 
   setSimDays: (days) => {
+    // Manual scrub / jump leaves live wall-clock lock
     simClock.days = days;
-    set({ simDaysUi: days });
+    simClock.realtime = false;
+    set({ simDaysUi: days, realtime: false });
   },
 
   setSpeed: (speed) => {
     simClock.speed = speed;
-    set({ speed });
+    simClock.realtime = false;
+    set({ speed, realtime: false });
+  },
+
+  enableRealtime: () => {
+    const days = daysSinceJ2000();
+    simClock.days = days;
+    simClock.speed = 1;
+    simClock.realtime = true;
+    simClock.playing = true;
+    set({
+      simDaysUi: days,
+      speed: 1,
+      realtime: true,
+      isPlaying: true,
+    });
   },
 
   togglePlay: () => {
@@ -200,9 +237,10 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   toggleOrbits: () => set((s) => ({ showOrbits: !s.showOrbits })),
   toggleLabels: () => set((s) => ({ showLabels: !s.showLabels })),
 
-  setScaleMode: (mode) => {
-    simClock.scaleMode = mode;
-    set({ scaleMode: mode });
+  setScaleMode: () => {
+    // App uses real scale only
+    simClock.scaleMode = "realistic";
+    set({ scaleMode: "realistic" });
   },
 
   setQuality: (q, locked = true) =>
@@ -268,6 +306,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       hideHud: true,
     })),
   setHideHud: (v) => set({ hideHud: v }),
+  setUiHidden: (v) => set({ uiHidden: v }),
+  toggleUiHidden: () => set((s) => ({ uiHidden: !s.uiHidden })),
 
   setShowOnboarding: (v) => set({ showOnboarding: v }),
   setShowInfoPanel: (v) => set({ showInfoPanel: v }),
@@ -277,7 +317,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setTourAuto: (v) => {
     set({ tourAuto: v, compareMode: false });
     if (v) {
-      // Keep user's speed (default 5k×) — do not jump to unlisted 50k×
+      // Keep user's speed / realtime lock — do not force a speed preset
       simClock.playing = true;
       set({ isPlaying: true });
       const step = guidedTour[get().tourStepIndex] ?? guidedTour[0];

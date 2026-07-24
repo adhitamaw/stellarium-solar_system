@@ -233,4 +233,28 @@ export const bodiesEn: Record<string, BodyText> = {
     composition: "Water ice and rock",
     funFact: "Nereid’s distance from Neptune can vary by more than 8×.",
   },
+  iss: {
+    name: "ISS",
+    description:
+      "The International Space Station — a crewed orbital laboratory in low Earth orbit (~420 km). Built by NASA, Roscosmos, ESA, JAXA, and CSA.",
+    composition: "Pressurized modules, truss, solar arrays, radiators",
+    funFact:
+      "The ISS orbits Earth about 16 times a day — one lap ~92 minutes at ~28,000 km/h.",
+  },
+  voyager1: {
+    name: "Voyager 1",
+    description:
+      "NASA interplanetary probe (1977). After Jupiter and Saturn flybys, it is now in interstellar space — the farthest human-made object from Earth.",
+    composition: "Aluminum bus, plutonium-238 RTG, 3.7 m high-gain antenna",
+    funFact:
+      "A one-way radio signal from Voyager 1 takes more than 22 hours to reach Earth.",
+  },
+  voyager2: {
+    name: "Voyager 2",
+    description:
+      "Twin of Voyager 1 (1977). The only probe to visit Uranus and Neptune; now also in interstellar space.",
+    composition: "Aluminum bus, plutonium-238 RTG, 3.7 m high-gain antenna",
+    funFact:
+      "Voyager 2 is the only spacecraft to complete a Grand Tour of all four giant planets.",
+  },
 };

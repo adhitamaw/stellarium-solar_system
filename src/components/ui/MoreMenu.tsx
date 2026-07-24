@@ -22,8 +22,6 @@ export function MoreMenu({
   const toggleOrbits = useSimulationStore((s) => s.toggleOrbits);
   const showLabels = useSimulationStore((s) => s.showLabels);
   const toggleLabels = useSimulationStore((s) => s.toggleLabels);
-  const scaleMode = useSimulationStore((s) => s.scaleMode);
-  const setScaleMode = useSimulationStore((s) => s.setScaleMode);
   const quality = useSimulationStore((s) => s.quality);
   const setQuality = useSimulationStore((s) => s.setQuality);
   const audioEnabled = useSimulationStore((s) => s.audioEnabled);
@@ -34,6 +32,7 @@ export function MoreMenu({
   const setAutoQuality = useSimulationStore((s) => s.setAutoQuality);
   const toggleCompareMode = useSimulationStore((s) => s.toggleCompareMode);
   const requestCapture = useSimulationStore((s) => s.requestCapture);
+  const setUiHidden = useSimulationStore((s) => s.setUiHidden);
   const selectedId = useSimulationStore((s) => s.selectedId);
   const fps = useSimulationStore((s) => s.fps);
   const t = useT();
@@ -92,15 +91,7 @@ export function MoreMenu({
         </Section>
 
         <Section title={t("display")}>
-          <Seg
-            items={[
-              { id: "visible", label: t("clearScale") },
-              { id: "realistic", label: t("realScale") },
-            ]}
-            value={scaleMode}
-            onChange={(v) => setScaleMode(v as "visible" | "realistic")}
-          />
-          <div className="mt-2 flex gap-2">
+          <div className="flex gap-2">
             <Toggle active={showOrbits} onClick={toggleOrbits}>
               {t("orbits")}
             </Toggle>
@@ -193,6 +184,14 @@ export function MoreMenu({
               }}
             >
               {t("capture")}
+            </Action>
+            <Action
+              onClick={() => {
+                onClose();
+                setUiHidden(true);
+              }}
+            >
+              {t("hideAll")}
             </Action>
           </div>
         </Section>

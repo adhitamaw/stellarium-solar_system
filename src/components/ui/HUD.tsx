@@ -29,12 +29,39 @@ export function HUD() {
   const cameraMode = useSimulationStore((s) => s.cameraMode);
   const compareMode = useSimulationStore((s) => s.compareMode);
   const hideHud = useSimulationStore((s) => s.hideHud);
+  const uiHidden = useSimulationStore((s) => s.uiHidden);
+  const setUiHidden = useSimulationStore((s) => s.setUiHidden);
   const sceneReady = useLoadingStore((s) => s.ready);
   const [menuOpen, setMenuOpen] = useState(false);
   const t = useT();
 
-  if (hideHud) {
-    return <KeyboardHandler />;
+  // Capture flash or user cinema mode — no menus
+  if (hideHud || uiHidden) {
+    return (
+      <>
+        <KeyboardHandler />
+        {/* Restore control only when user hid UI (not mid-screenshot) */}
+        {uiHidden && !hideHud && (
+          <div
+            className="pointer-events-none absolute inset-0 z-50"
+            style={{
+              paddingTop: "var(--safe-top)",
+              paddingRight: "var(--safe-right)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setUiHidden(false)}
+              className="x-btn pointer-events-auto absolute right-3 top-3 z-50 h-9 px-3 text-[10px] uppercase tracking-[0.12em] md:right-4 md:top-4"
+              title={`${t("showUi")} (H)`}
+              aria-label={t("showUi")}
+            >
+              {t("showUi")}
+            </button>
+          </div>
+        )}
+      </>
+    );
   }
 
   return (
@@ -67,6 +94,15 @@ export function HUD() {
           <LanguageToggle compact />
           {!compareMode && (
             <>
+              <button
+                type="button"
+                onClick={() => setUiHidden(true)}
+                className="x-btn h-8 px-2 text-[10px] uppercase tracking-[0.08em]"
+                title={t("hideAll")}
+                aria-label={t("hideAll")}
+              >
+                {t("hide")}
+              </button>
               <SearchBar compact />
               <button
                 type="button"

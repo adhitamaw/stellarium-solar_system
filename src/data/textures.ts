@@ -301,6 +301,10 @@ export const bodyTextures: Record<string, BodyTextureSet> = {
     detailStrength: 0.55,
     irregularScale: [1, 0.9, 0.95],
   },
+  // Craft use dedicated meshes in components/canvas/spacecraft/
+  iss: { color: "#e8f0f8" },
+  voyager1: { color: "#f5d090" },
+  voyager2: { color: "#e8c070" },
 };
 
 export const TEXTURE_ANISOTROPY = 16;

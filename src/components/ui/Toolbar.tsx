@@ -13,8 +13,6 @@ export function Toolbar() {
   const toggleOrbits = useSimulationStore((s) => s.toggleOrbits);
   const showLabels = useSimulationStore((s) => s.showLabels);
   const toggleLabels = useSimulationStore((s) => s.toggleLabels);
-  const scaleMode = useSimulationStore((s) => s.scaleMode);
-  const setScaleMode = useSimulationStore((s) => s.setScaleMode);
   const quality = useSimulationStore((s) => s.quality);
   const setQuality = useSimulationStore((s) => s.setQuality);
   const fps = useSimulationStore((s) => s.fps);
@@ -32,18 +30,6 @@ export function Toolbar() {
           ]}
           value={cameraMode}
           onChange={(v) => setCameraMode(v as "orbit" | "fly")}
-        />
-
-        <div className="mx-0.5 hidden h-5 w-px shrink-0 bg-white/10 sm:block" />
-
-        <ToggleGroup
-          label={t("display")}
-          options={[
-            { id: "visible", label: t("clearScale") },
-            { id: "realistic", label: t("realScale") },
-          ]}
-          value={scaleMode}
-          onChange={(v) => setScaleMode(v as "visible" | "realistic")}
         />
 
         <div className="mx-0.5 hidden h-5 w-px shrink-0 bg-white/10 sm:block" />

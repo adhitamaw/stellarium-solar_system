@@ -4,6 +4,8 @@ import {
   bodyById,
   planets,
   moons,
+  probes,
+  satellites,
   sun,
 } from "@/data/celestialBodies";
 import { bodyPositions, simClock, type ScaleMode } from "@/lib/simClock";
@@ -18,6 +20,14 @@ export function meanAnomaly(body: CelestialBody, simDays: number): number {
   return f * Math.PI * 2;
 }
 
+/** True if body is bound to a parent (moons, ISS, …) */
+function isParentBound(body: CelestialBody): boolean {
+  return (
+    body.type === "moon" ||
+    (body.type === "spacecraft" && !!body.parentId)
+  );
+}
+
 /** Visual radius of a body in scene units */
 export function visualRadius(
   body: CelestialBody,
@@ -29,7 +39,13 @@ export function visualRadius(
   const earthKm = 6_371;
   let r = (body.radiusKm / earthKm) * earthRef;
 
-  if (body.type === "moon") {
+  if (body.type === "spacecraft") {
+    // Physical craft are meters-scale — slightly exaggerated for readability
+    // ISS must stay small vs Earth so LEO orbit doesn't clip the surface
+    r = body.parentId
+      ? 0.048 // ISS (truss span ~109 m; visual marker only)
+      : 0.16; // Voyager dish + boom silhouette
+  } else if (body.type === "moon") {
     // Tiny moons (Phobos/Deimos) stay visible without looking planet-sized
     if (body.radiusKm < 50) {
       r = Math.max(r * 2.8, 0.055);
@@ -58,13 +74,24 @@ export function visualOrbitRadius(
   scaleMode: ScaleMode,
 ): number {
   if (body.type === "star") return 0;
-  if (body.type === "moon") {
+  if (isParentBound(body)) {
     const parent = body.parentId ? bodyById[body.parentId] : undefined;
     const parentR = parent ? visualRadius(parent, scaleMode) : 1;
     const parentKm = parent?.radiusKm ?? 6_371;
     // Relative to parent radius (Phobos ~2.8 R_mars, Deimos ~6.9 R_mars)
     const realRatio = body.orbitRadius / parentKm;
     // Soft log spacing so close moons stay near parent but siblings separate
+    // LEO craft (ISS ~420 km ≈ 1.066 R⊕): real altitude is tiny vs planet size.
+    // Visually we keep it near Earth but outside the mesh + atmosphere (~1.02 R)
+    // and outside the exaggerated craft half-span so solar arrays never clip.
+    if (body.type === "spacecraft" && realRatio < 2.5) {
+      const craftR = visualRadius(body, scaleMode);
+      // modelScale ≈ craftR * 1.15, local half-span ≈ 1 → world half-span ≈ craftR
+      const halfSpan = craftR * 1.2;
+      // Atmosphere shell ~1.02–1.04 parentR; leave clear air above that + craft
+      const minOrbit = parentR * 1.08 + halfSpan * 2.8;
+      return Math.max(minOrbit, parentR + 0.22);
+    }
     const spaced =
       parentR *
       (1.25 + Math.pow(Math.max(realRatio, 0.5) / 8, 0.48) * 2.4);
@@ -96,12 +123,14 @@ export function writeBodyPosition(
   const angle = meanAnomaly(body, simDays);
   const r = visualOrbitRadius(body, scaleMode);
   const incl = (body.inclinationDeg * Math.PI) / 180;
+  // Deep-space probes: steeper inclination tilt so paths leave the ecliptic plane
+  const inclAmp = body.type === "spacecraft" && !body.parentId ? 0.35 : 0.15;
 
   const x = Math.cos(angle) * r;
   const z = Math.sin(angle) * r;
-  const y = Math.sin(angle) * Math.sin(incl) * r * 0.15;
+  const y = Math.sin(angle) * Math.sin(incl) * r * inclAmp;
 
-  if (body.type === "moon" && parent) {
+  if (isParentBound(body) && parent) {
     out.x = parent.x + x;
     out.y = parent.y + y;
     out.z = parent.z + z;
@@ -150,5 +179,18 @@ export function updateAllBodyPositions() {
     const pos = scratch(m.id);
     writeBodyPosition(m, days, scale, pos, parent);
     bodyPositions.set(m.id, pos);
+  }
+
+  for (const s of satellites) {
+    const parent = s.parentId ? bodyPositions.get(s.parentId) : undefined;
+    const pos = scratch(s.id);
+    writeBodyPosition(s, days, scale, pos, parent);
+    bodyPositions.set(s.id, pos);
+  }
+
+  for (const p of probes) {
+    const pos = scratch(p.id);
+    writeBodyPosition(p, days, scale, pos);
+    bodyPositions.set(p.id, pos);
   }
 }

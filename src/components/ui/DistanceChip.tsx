@@ -36,11 +36,11 @@ export function DistanceChip() {
   let distLabel = "";
   if (raw.type === "star") {
     distLabel = t("systemCenter");
-  } else if (parent && raw.type === "moon") {
+  } else if (parent && (raw.type === "moon" || raw.type === "spacecraft")) {
     distLabel = `${formatThousandKm(raw.orbitRadius, locale)} ${t("from")} ${parent.name}`;
   } else {
     const sunName = sun?.name ?? (locale === "id" ? "Matahari" : "Sun");
-    distLabel = `${formatDistance(raw.distanceAu, locale)} ${t("from")} ${sunName}`;
+    distLabel = `${formatDistance(raw.distanceAu ?? raw.orbitRadius, locale)} ${t("from")} ${sunName}`;
   }
 
   return (

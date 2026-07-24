@@ -27,6 +27,14 @@ export function focusIdFromSearch(search: string): string | null {
       uranus: "uranus",
       neptunus: "neptune",
       neptune: "neptune",
+      iss: "iss",
+      "stasiun-luar-angkasa": "iss",
+      "international-space-station": "iss",
+      voyager: "voyager1",
+      voyager1: "voyager1",
+      "voyager-1": "voyager1",
+      voyager2: "voyager2",
+      "voyager-2": "voyager2",
     };
     return aliases[raw] ?? null;
   } catch {

@@ -18,6 +18,7 @@ export function FinishingBar() {
   const setAutoQuality = useSimulationStore((s) => s.setAutoQuality);
   const showShortcuts = useSimulationStore((s) => s.showShortcuts);
   const setShowShortcuts = useSimulationStore((s) => s.setShowShortcuts);
+  const setUiHidden = useSimulationStore((s) => s.setUiHidden);
   const selectedId = useSimulationStore((s) => s.selectedId);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
   const t = useT();
@@ -116,6 +117,16 @@ export function FinishingBar() {
           title={t("help")}
         >
           ?
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setUiHidden(true)}
+          className="x-btn h-8 px-2.5 text-[10px] uppercase tracking-[0.1em]"
+          title={`${t("hideAll")} (H)`}
+          aria-label={t("hideAll")}
+        >
+          {t("hideAll")}
         </button>
       </div>
       {shareMsg && (

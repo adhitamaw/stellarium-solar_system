@@ -17,7 +17,11 @@ interface OrbitLineProps {
 export function OrbitLine({ body, scaleMode, highlighted }: OrbitLineProps) {
   const points = useMemo(() => {
     const r = visualOrbitRadius(body, scaleMode);
-    const segments = body.type === "moon" ? 64 : 128;
+    const segments =
+      body.type === "moon" ||
+      (body.type === "spacecraft" && body.parentId)
+        ? 64
+        : 128;
     const incl = THREE.MathUtils.degToRad(body.inclinationDeg);
     const pts: [number, number, number][] = [];
 
@@ -36,7 +40,13 @@ export function OrbitLine({ body, scaleMode, highlighted }: OrbitLineProps) {
       points={points}
       color={highlighted ? "#7dd3fc" : "#ffffff"}
       transparent
-      opacity={highlighted ? 0.55 : body.type === "moon" ? 0.14 : 0.18}
+      opacity={
+        highlighted
+          ? 0.55
+          : body.type === "moon" || body.type === "spacecraft"
+            ? 0.14
+            : 0.18
+      }
       lineWidth={1}
       depthWrite={false}
       raycast={() => null}

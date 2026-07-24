@@ -14,10 +14,6 @@ import { useLocaleStore, useT } from "@/store/useLocaleStore";
 import { localizeBody, bodyTypeLabel, localizeTourStep } from "@/i18n/localize";
 import { formatSimDate } from "@/i18n/format";
 
-const SPEEDS = SPEED_PRESETS.filter((p) =>
-  [1, 5_000, 10_000, 100_000, 1_000_000].includes(p.value),
-);
-
 /** Mobile dock — SpaceX / xAI black control surface */
 export function MobileDock() {
   const tourStepIndex = useSimulationStore((s) => s.tourStepIndex);
@@ -28,7 +24,9 @@ export function MobileDock() {
   const isPlaying = useSimulationStore((s) => s.isPlaying);
   const togglePlay = useSimulationStore((s) => s.togglePlay);
   const speed = useSimulationStore((s) => s.speed);
+  const realtime = useSimulationStore((s) => s.realtime);
   const setSpeed = useSimulationStore((s) => s.setSpeed);
+  const enableRealtime = useSimulationStore((s) => s.enableRealtime);
   const simDays = useSimulationStore((s) => s.simDaysUi);
   const selectedId = useSimulationStore((s) => s.selectedId);
   const showInfoPanel = useSimulationStore((s) => s.showInfoPanel);
@@ -38,11 +36,16 @@ export function MobileDock() {
   const t = useT();
 
   useEffect(() => {
-    const current = useSimulationStore.getState().speed;
-    if (!SPEED_PRESETS.some((p) => p.value === current)) {
+    const state = useSimulationStore.getState();
+    if (state.realtime) {
+      simClock.realtime = true;
+      simClock.speed = 1;
+      return;
+    }
+    if (!SPEED_PRESETS.some((p) => p.value === state.speed)) {
       setSpeed(DEFAULT_SPEED);
     } else {
-      simClock.speed = current;
+      simClock.speed = state.speed;
     }
   }, [setSpeed]);
 
@@ -54,7 +57,7 @@ export function MobileDock() {
   const total = guidedTour.length;
   const atStart = tourStepIndex <= 0;
   const atEnd = tourStepIndex >= total - 1;
-  const date = formatSimDate(simDays, locale);
+  const date = formatSimDate(simDays, locale, { withTime: realtime });
   const selectedRaw = selectedId ? bodyById[selectedId] : null;
   const selectedBody = selectedRaw
     ? localizeBody(selectedRaw, locale)
@@ -196,17 +199,28 @@ export function MobileDock() {
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </DockBtn>
 
-            <p className="min-w-0 shrink truncate font-mono text-[10px] tracking-wide text-white/40 tabular-nums">
+            <p
+              className="min-w-0 shrink truncate font-mono text-[10px] tracking-wide text-white/40 tabular-nums"
+              suppressHydrationWarning
+            >
               {date}
             </p>
 
             <div className="chip-scroll flex min-w-0 flex-1 items-center gap-0.5">
-              {SPEEDS.map((p) => (
+              <button
+                type="button"
+                onClick={() => enableRealtime()}
+                className={`x-chip ${realtime ? "is-active" : ""}`}
+                title={t("speedRealtime")}
+              >
+                {t("speedRealtime")}
+              </button>
+              {SPEED_PRESETS.map((p) => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => setSpeed(p.value)}
-                  className={`x-chip ${speed === p.value ? "is-active" : ""}`}
+                  className={`x-chip ${!realtime && speed === p.value ? "is-active" : ""}`}
                 >
                   {p.label}
                 </button>

@@ -13,6 +13,10 @@ export function KeyboardHandler() {
       const s = useSimulationStore.getState();
 
       if (e.key === "Escape") {
+        if (s.uiHidden) {
+          s.setUiHidden(false);
+          return;
+        }
         if (s.compareMode) s.setCompareMode(false);
         else if (s.showShortcuts) s.setShowShortcuts(false);
         else if (s.showInfoPanel) s.setShowInfoPanel(false);
@@ -22,6 +26,13 @@ export function KeyboardHandler() {
       if (e.key === "?" || (e.shiftKey && e.key === "/")) {
         e.preventDefault();
         s.setShowShortcuts(!s.showShortcuts);
+        return;
+      }
+
+      // H = hide / show all menus (cinema mode)
+      if (e.key.toLowerCase() === "h" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        s.toggleUiHidden();
         return;
       }
 

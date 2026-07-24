@@ -1,4 +1,4 @@
-export type BodyType = "star" | "planet" | "moon" | "asteroid";
+export type BodyType = "star" | "planet" | "moon" | "asteroid" | "spacecraft";
 
 export interface CelestialBody {
   id: string;
@@ -665,6 +665,70 @@ export const celestialBodies: CelestialBody[] = [
     composition: "Es air dan batuan",
     funFact: "Jarak Nereid ke Neptunus bisa berubah lebih dari 8× antara periapsis dan apoapsis.",
   },
+
+  // --- Spacecraft ---
+  {
+    id: "iss",
+    name: "ISS",
+    type: "spacecraft",
+    parentId: "earth",
+    /** Half of ~109 m truss span — for display; visual size is exaggerated */
+    radiusKm: 0.0545,
+    /** Mean orbital radius from Earth center (~420 km altitude) */
+    orbitRadius: 6_791,
+    orbitalPeriodDays: 0.06436,
+    rotationPeriodHours: 1.545,
+    axialTiltDeg: 0,
+    inclinationDeg: 51.64,
+    phaseOffset: 0.18,
+    color: "#d8e4f0",
+    description:
+      "Stasiun Luar Angkasa Internasional — laboratorium orbital berawak di orbit rendah Bumi (~420 km). Dibangun bersama oleh NASA, Roscosmos, ESA, JAXA, dan CSA.",
+    composition: "Modul bertekanan, truss, panel surya, radiator",
+    funFact:
+      "ISS mengorbit Bumi sekitar 16 kali per hari — satu putaran ~92 menit, ~28.000 km/jam.",
+  },
+  {
+    id: "voyager1",
+    name: "Voyager 1",
+    type: "spacecraft",
+    /** Bus ~3–4 m; visual marker exaggerated */
+    radiusKm: 0.002,
+    /** Approx. heliocentric distance (AU, ~2026) */
+    orbitRadius: 167,
+    /** Pseudo-Kepler period at that distance (escape trajectory, for viz only) */
+    orbitalPeriodDays: 790_000,
+    rotationPeriodHours: 24,
+    axialTiltDeg: 0,
+    inclinationDeg: 35.0,
+    phaseOffset: 0.72,
+    color: "#f0c878",
+    description:
+      "Wahana antarplanet NASA (1977). Setelah flyby Jupiter & Saturnus, kini di ruang antarbintang — objek buatan manusia terjauh dari Bumi.",
+    composition: "Bus aluminium, RTG plutonium-238, antena high-gain 3,7 m",
+    distanceAu: 167,
+    funFact:
+      "Sinyal radio Voyager 1 butuh lebih dari 22 jam (satu arah) untuk sampai ke Bumi.",
+  },
+  {
+    id: "voyager2",
+    name: "Voyager 2",
+    type: "spacecraft",
+    radiusKm: 0.002,
+    orbitRadius: 140,
+    orbitalPeriodDays: 605_000,
+    rotationPeriodHours: 24,
+    axialTiltDeg: 0,
+    inclinationDeg: 48.0,
+    phaseOffset: 0.31,
+    color: "#e8b860",
+    description:
+      "Kembar Voyager 1 (1977). Satu-satunya wahana yang mengunjungi Uranus dan Neptunus; kini juga di ruang antarbintang.",
+    composition: "Bus aluminium, RTG plutonium-238, antena high-gain 3,7 m",
+    distanceAu: 140,
+    funFact:
+      "Voyager 2 adalah satu-satunya wahana yang melakukan Grand Tour ke keempat raksasa gas/es.",
+  },
 ];
 
 export const bodyById = Object.fromEntries(
@@ -673,6 +737,14 @@ export const bodyById = Object.fromEntries(
 
 export const planets = celestialBodies.filter((b) => b.type === "planet");
 export const moons = celestialBodies.filter((b) => b.type === "moon");
+/** Heliocentric probes (Voyager, etc.) */
+export const probes = celestialBodies.filter(
+  (b) => b.type === "spacecraft" && !b.parentId,
+);
+/** Earth-orbit / parent-bound craft (ISS, etc.) */
+export const satellites = celestialBodies.filter(
+  (b) => b.type === "spacecraft" && !!b.parentId,
+);
 export const sun = bodyById.sun;
 
 export function getChildren(parentId: string): CelestialBody[] {

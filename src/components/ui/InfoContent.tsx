@@ -26,19 +26,24 @@ export function InfoBody({
   const ret = ` · ${t("retrograde")}`;
 
   const orbitValue =
-    body.type === "moon"
+    body.type === "moon" || (body.type === "spacecraft" && body.parentId)
       ? formatThousandKm(body.orbitRadius, locale)
-      : formatDistance(body.distanceAu, locale);
+      : formatDistance(body.distanceAu ?? body.orbitRadius, locale);
 
+  const absPeriod = Math.abs(body.orbitalPeriodDays);
   const periodValue =
     body.orbitalPeriodDays !== 0
-      ? Math.abs(body.orbitalPeriodDays) < 400
-        ? `${formatNumber(Math.abs(body.orbitalPeriodDays), locale, 1)} ${t("days")}${
+      ? absPeriod < 1
+        ? `${formatNumber(absPeriod * 24 * 60, locale, 0)} ${t("minutes")}${
             body.orbitalPeriodDays < 0 ? ret : ""
           }`
-        : `${formatNumber(Math.abs(body.orbitalPeriodDays) / 365.25, locale, 1)} ${t("years")}${
-            body.orbitalPeriodDays < 0 ? ret : ""
-          }`
+        : absPeriod < 400
+          ? `${formatNumber(absPeriod, locale, 1)} ${t("days")}${
+              body.orbitalPeriodDays < 0 ? ret : ""
+            }`
+          : `${formatNumber(absPeriod / 365.25, locale, 1)} ${t("years")}${
+              body.orbitalPeriodDays < 0 ? ret : ""
+            }`
       : null;
 
   return (
